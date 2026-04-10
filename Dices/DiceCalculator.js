@@ -4,6 +4,7 @@ let currentMaxCount = 0n;
 let currentTotalCount = 0n;
 let sortCol = 'product';
 let sortAsc = true;
+let calcId = 0;
 
 function switchTab(tab) {
   activeTab = tab;
@@ -22,15 +23,19 @@ function applyPreset(numDice, faces) {
   calculate();
 }
 
+function showLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('visible', show);
+}
+
 function calculate() {
   const errorEl = document.getElementById('diceError');
   const numberOfDice = parseInt(document.getElementById('numDice').value, 10);
   if (isNaN(numberOfDice) || numberOfDice < 1) {
-    errorEl.textContent = 'Please enter the number of dice (1~30).';
+    errorEl.textContent = 'Please enter the number of dice (1~20).';
     return;
   }
-  if (numberOfDice > 30) {
-    errorEl.textContent = 'Maximum 30 dice allowed.';
+  if (numberOfDice > 20) {
+    errorEl.textContent = 'Maximum 20 dice allowed.';
     return;
   }
   errorEl.textContent = '';
@@ -53,70 +58,89 @@ function calculate() {
   const headerEl = document.getElementById('resultHeader');
   headerEl.innerHTML = (isProduct ? 'Product' : 'Sum') + ' <span class="sort-arrow"></span>';
 
-  // Map-based convolution: value -> count (BigInt)
-  let dist = new Map();
-  dist.set(isProduct ? 1 : 0, 1n);
+  const thisCalcId = ++calcId;
+  showLoading(true);
 
-  for (let d = 0; d < numberOfDice; d++) {
-    const next = new Map();
-    for (const [val, count] of dist) {
-      for (const face of faceSetOfDice) {
-        const newVal = isProduct ? val * face : val + face;
-        next.set(newVal, (next.get(newVal) || 0n) + count);
+  // Yield to browser for rendering the loading indicator, then compute
+  setTimeout(() => {
+    if (thisCalcId !== calcId) return;
+
+    // Map-based convolution: value -> count (BigInt)
+    let dist = new Map();
+    dist.set(isProduct ? 1 : 0, 1n);
+
+    let aborted = false;
+    for (let d = 0; d < numberOfDice; d++) {
+      const next = new Map();
+      for (const [val, count] of dist) {
+        for (const face of faceSetOfDice) {
+          const newVal = isProduct ? val * face : val + face;
+          next.set(newVal, (next.get(newVal) || 0n) + count);
+        }
+      }
+      dist = next;
+      if (dist.size > 100_000) {
+        aborted = true;
+        break;
       }
     }
-    dist = next;
-    if (dist.size > 100_000) {
+
+    if (thisCalcId !== calcId) return;
+
+    if (aborted) {
       document.getElementById('resultsSection').classList.remove('visible');
       document.getElementById('expectedSection').classList.remove('visible');
+      showLoading(false);
       return;
     }
-  }
 
-  // Sort by value
-  const sorted = Array.from(dist.entries()).sort((a, b) => a[0] - b[0]);
+    // Sort by value
+    const sorted = Array.from(dist.entries()).sort((a, b) => a[0] - b[0]);
 
-  // Calculate expected values and total count
-  let totalWeighted = 0;
-  let totalCount = 0n;
-  const rows = [];
-  for (const [product, count] of sorted) {
-    totalWeighted += product * Number(count);
-    totalCount += count;
-    rows.push({ product, count });
-  }
+    // Calculate expected values and total count
+    let totalWeighted = 0;
+    let totalCount = 0n;
+    const rows = [];
+    for (const [product, count] of sorted) {
+      totalWeighted += product * Number(count);
+      totalCount += count;
+      rows.push({ product, count });
+    }
 
-  const totalCountNum = Number(totalCount);
-  const expectedValue = totalWeighted / totalCountNum;
-  const maxCount = rows.reduce((max, r) => r.count > max ? r.count : max, 0n);
+    const totalCountNum = Number(totalCount);
+    const expectedValue = totalWeighted / totalCountNum;
+    const maxCount = rows.reduce((max, r) => r.count > max ? r.count : max, 0n);
 
-  // Assign ranks by count descending (same count = same rank)
-  const countsSorted = [...new Set(rows.map(r => r.count))].sort((a, b) => (b > a ? 1 : b < a ? -1 : 0));
-  const rankMap = new Map();
-  countsSorted.forEach((c, i) => rankMap.set(c, i + 1));
-  for (const row of rows) {
-    row.rank = rankMap.get(row.count);
-    row.prob = Number(row.count) / totalCountNum * 100;
-  }
+    // Assign ranks by count descending (same count = same rank)
+    const countsSorted = [...new Set(rows.map(r => r.count))].sort((a, b) => (b > a ? 1 : b < a ? -1 : 0));
+    const rankMap = new Map();
+    countsSorted.forEach((c, i) => rankMap.set(c, i + 1));
+    for (const row of rows) {
+      row.rank = rankMap.get(row.count);
+      row.prob = Number(row.count) / totalCountNum * 100;
+    }
 
-  currentRows = rows;
-  currentMaxCount = maxCount;
-  currentTotalCount = totalCount;
-  sortCol = 'product';
-  sortAsc = true;
-  renderTable();
+    currentRows = rows;
+    currentMaxCount = maxCount;
+    currentTotalCount = totalCount;
+    sortCol = 'product';
+    sortAsc = true;
+    renderTable();
 
-  // Show results
-  document.getElementById('resultsSection').classList.add('visible');
-  document.getElementById('expectedSection').classList.add('visible');
+    // Show results
+    document.getElementById('resultsSection').classList.add('visible');
+    document.getElementById('expectedSection').classList.add('visible');
 
-  // Format expected value
-  const evStr = Number.isInteger(expectedValue)
-    ? expectedValue.toLocaleString()
-    : expectedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
-  document.getElementById('expectedValue').textContent = evStr;
-  document.getElementById('summaryText').innerHTML =
-    `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} total combinations<br>${rows.length} unique ${isProduct ? 'products' : 'sums'}`;
+    // Format expected value
+    const evStr = Number.isInteger(expectedValue)
+      ? expectedValue.toLocaleString()
+      : expectedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+    document.getElementById('expectedValue').textContent = evStr;
+    document.getElementById('summaryText').innerHTML =
+      `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} total combinations<br>${rows.length} unique ${isProduct ? 'products' : 'sums'}`;
+
+    showLoading(false);
+  }, 0);
 }
 
 function renderTable() {

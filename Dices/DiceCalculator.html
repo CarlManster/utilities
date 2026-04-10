@@ -26,7 +26,7 @@
       <div>
         <label for="numDice">Number of Dice</label>
         <div class="hint">How many dice to roll</div>
-        <input type="number" id="numDice" value="3" min="1" max="30" oninput="calculate()">
+        <input type="number" id="numDice" value="3" min="1" max="20" oninput="calculate()">
         <div class="error-msg" id="diceError"></div>
       </div>
       <div>
@@ -95,6 +95,11 @@
 </div>
 
 </div><!-- end main-layout -->
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Calculating...</div>
+</div>
 
 <script src="DiceCalculator.js"></script>
 
