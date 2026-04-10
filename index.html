@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workspace</title>
+<title>Utilities</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; }
@@ -37,20 +37,21 @@
     align-items: center;
     padding: 0 1.25rem;
     color: #a1a1a6;
-    font-size: 0.875rem;
+    font-size: 1.25rem;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
     user-select: none;
   }
   nav .nav-link:hover {
     color: #f5f5f7;
+    background: rgba(255,255,255,0.08);
   }
   nav .nav-link.active {
-    color: #f5f5f7;
-    border-bottom-color: #0071e3;
+    color: #fff;
+    background: #0071e3;
   }
   iframe {
     flex: 1;
@@ -62,14 +63,14 @@
 <body>
 
 <nav>
-  <div class="brand">Workspace</div>
+  <div class="brand">Utilities</div>
   <div class="nav-links">
-    <a class="nav-link active" data-src="Dices.html" onclick="navigate(this)">Dice Calculator</a>
-    <a class="nav-link" data-src="color-picker.html" onclick="navigate(this)">Color Picker</a>
+    <a class="nav-link active" data-src="Dices/Dices.html" onclick="navigate(this)" title="Dice Calculator">&#x1F3B2;</a>
+    <a class="nav-link" data-src="ColorPicker/color-picker.html" onclick="navigate(this)" title="Color Picker">&#x1F3A8;</a>
   </div>
 </nav>
 
-<iframe id="content" src="Dices.html"></iframe>
+<iframe id="content" src="Dices/Dices.html"></iframe>
 
 <script>
 function navigate(el) {
