@@ -284,6 +284,12 @@ th:first-child, td:first-child { text-align: left; }
   width: auto;
   margin: 0;
 }
+.error-msg {
+  font-size: 0.8rem;
+  color: #ff3b30;
+  margin-top: 0.3rem;
+  min-height: 1.1em;
+}
 
 /* ─── Responsive ─── */
 @media (max-width: 900px) {

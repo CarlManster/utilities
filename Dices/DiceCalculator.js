@@ -1,7 +1,7 @@
 let activeTab = 'csv';
 let currentRows = [];
-let currentMaxCount = 0;
-let currentTotalCount = 0;
+let currentMaxCount = 0n;
+let currentTotalCount = 0n;
 let sortCol = 'product';
 let sortAsc = true;
 
@@ -23,8 +23,17 @@ function applyPreset(numDice, faces) {
 }
 
 function calculate() {
+  const errorEl = document.getElementById('diceError');
   const numberOfDice = parseInt(document.getElementById('numDice').value, 10);
-  if (isNaN(numberOfDice) || numberOfDice < 1 || numberOfDice > 10) return;
+  if (isNaN(numberOfDice) || numberOfDice < 1) {
+    errorEl.textContent = 'Please enter the number of dice (1~100).';
+    return;
+  }
+  if (numberOfDice > 100) {
+    errorEl.textContent = 'Maximum 100 dice allowed.';
+    return;
+  }
+  errorEl.textContent = '';
 
   let faceSetOfDice;
   if (activeTab === 'csv') {
@@ -39,51 +48,55 @@ function calculate() {
     for (let i = start; i <= end; i++) faceSetOfDice.push(i);
   }
 
-  const totalCombinations = Math.pow(faceSetOfDice.length, numberOfDice);
-  if (totalCombinations > 5_000_000) return;
-
   const operation = document.querySelector('input[name="operation"]:checked').value;
   const isProduct = operation === 'product';
   const headerEl = document.getElementById('resultHeader');
   headerEl.innerHTML = (isProduct ? 'Product' : 'Sum') + ' <span class="sort-arrow"></span>';
-  const rollResultSet = new Map();
 
-  function roll(remaining, acc) {
-    if (remaining === 0) {
-      rollResultSet.set(acc, (rollResultSet.get(acc) || 0) + 1);
+  // Map-based convolution: value -> count (BigInt)
+  let dist = new Map();
+  dist.set(isProduct ? 1 : 0, 1n);
+
+  for (let d = 0; d < numberOfDice; d++) {
+    const next = new Map();
+    for (const [val, count] of dist) {
+      for (const face of faceSetOfDice) {
+        const newVal = isProduct ? val * face : val + face;
+        next.set(newVal, (next.get(newVal) || 0n) + count);
+      }
+    }
+    dist = next;
+    if (dist.size > 100_000) {
+      document.getElementById('resultsSection').classList.remove('visible');
+      document.getElementById('expectedSection').classList.remove('visible');
       return;
     }
-    for (const face of faceSetOfDice) {
-      roll(remaining - 1, isProduct ? acc * face : acc + face);
-    }
   }
 
-  roll(numberOfDice, isProduct ? 1 : 0);
+  // Sort by value
+  const sorted = Array.from(dist.entries()).sort((a, b) => a[0] - b[0]);
 
-  // Sort by product key
-  const sorted = Array.from(rollResultSet.entries()).sort((a, b) => a[0] - b[0]);
-
-  // Calculate expected values
+  // Calculate expected values and total count
   let totalWeighted = 0;
-  let totalCount = 0;
+  let totalCount = 0n;
   const rows = [];
   for (const [product, count] of sorted) {
-    const weighted = product * count;
-    totalWeighted += weighted;
+    totalWeighted += product * Number(count);
     totalCount += count;
-    rows.push({ product, count, weighted });
+    rows.push({ product, count });
   }
 
-  const expectedValue = totalWeighted / totalCount;
-  const maxCount = Math.max(...rows.map(r => r.count));
+  const totalCountNum = Number(totalCount);
+  const expectedValue = totalWeighted / totalCountNum;
+  const maxCount = rows.reduce((max, r) => r.count > max ? r.count : max, 0n);
 
   // Assign ranks by count descending (same count = same rank)
-  const countsSorted = [...new Set(rows.map(r => r.count))].sort((a, b) => b - a);
+  const countsSorted = [...new Set(rows.map(r => r.count))].sort((a, b) => (b > a ? 1 : b < a ? -1 : 0));
   const rankMap = new Map();
   countsSorted.forEach((c, i) => rankMap.set(c, i + 1));
   for (const row of rows) {
     row.rank = rankMap.get(row.count);
-    row.prob = row.count / totalCount * 100;
+    row.prob = Number(row.count) / totalCountNum * 100;
   }
 
   currentRows = rows;
@@ -110,11 +123,11 @@ function renderTable() {
   const tbody = document.getElementById('resultsBody');
   tbody.innerHTML = '';
   for (const row of currentRows) {
-    const barWidth = (row.count / currentMaxCount * 100);
+    const barWidth = Number(row.count) / Number(currentMaxCount) * 100;
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td>${row.rank}</td>` +
-      `<td>${row.product}</td>` +
+      `<td>${row.product.toLocaleString()}</td>` +
       `<td>${row.count.toLocaleString()}</td>` +
       `<td>${row.prob.toFixed(4)}%</td>` +
       `<td class="bar-cell"><span class="bar" style="width:${barWidth}%"></span></td>`;
@@ -143,7 +156,12 @@ function sortTable(col) {
     sortAsc = true;
   }
   const key = (col === 'prob' || col === 'dist') ? 'count' : col;
-  currentRows.sort((a, b) => sortAsc ? a[key] - b[key] : b[key] - a[key]);
+  currentRows.sort((a, b) => {
+    const av = a[key], bv = b[key];
+    if (av < bv) return sortAsc ? -1 : 1;
+    if (av > bv) return sortAsc ? 1 : -1;
+    return 0;
+  });
   renderTable();
 }
 
