@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RGB 색상 피커</title>
+<link rel="stylesheet" href="ColorPicker.css">
+</head>
+<body>
+
+<div class="panel left-panel">
+  <div>
+    <h1>RGB 색상 피커</h1>
+    <p style="font-size:12px;color:#888;margin-top:4px;">슬라이더를 움직여 색상을 조절하세요</p>
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-item">
+      <div class="slider-header">
+        <span class="slider-label" style="color:#e74c3c;">RED</span>
+        <span class="slider-value" id="valR" style="color:#e74c3c;">128</span>
+      </div>
+      <div class="slider-input-row">
+        <input type="range" id="sliderR" min="0" max="255" value="128">
+        <input type="number" class="num-input" id="numR" min="0" max="255" value="128">
+      </div>
+    </div>
+    <div class="slider-item">
+      <div class="slider-header">
+        <span class="slider-label" style="color:#2ecc71;">GREEN</span>
+        <span class="slider-value" id="valG" style="color:#2ecc71;">128</span>
+      </div>
+      <div class="slider-input-row">
+        <input type="range" id="sliderG" min="0" max="255" value="128">
+        <input type="number" class="num-input" id="numG" min="0" max="255" value="128">
+      </div>
+    </div>
+    <div class="slider-item">
+      <div class="slider-header">
+        <span class="slider-label" style="color:#3498db;">BLUE</span>
+        <span class="slider-value" id="valB" style="color:#3498db;">128</span>
+      </div>
+      <div class="slider-input-row">
+        <input type="range" id="sliderB" min="0" max="255" value="128">
+        <input type="number" class="num-input" id="numB" min="0" max="255" value="128">
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-group">
+    <div class="color-preview" id="preview"></div>
+    <div class="hex-display" id="hexDisplay" title="클릭하여 복사">#808080</div>
+  </div>
+
+  <div class="info-sections">
+    <div class="info-section">
+      <h2>RGB</h2>
+      <div class="info-grid">
+        <span class="info-label">R</span><span class="info-val" id="rgbR">128</span><span class="info-hex" id="rgbRh">80</span>
+        <span class="info-label">G</span><span class="info-val" id="rgbG">128</span><span class="info-hex" id="rgbGh">80</span>
+        <span class="info-label">B</span><span class="info-val" id="rgbB">128</span><span class="info-hex" id="rgbBh">80</span>
+      </div>
+    </div>
+    <div class="info-section">
+      <h2>CMY</h2>
+      <div class="info-grid">
+        <span class="info-label">C</span><span class="info-val" id="cmyC">127</span><span class="info-hex" id="cmyCh">7F</span>
+        <span class="info-label">M</span><span class="info-val" id="cmyM">127</span><span class="info-hex" id="cmyMh">7F</span>
+        <span class="info-label">Y</span><span class="info-val" id="cmyY">127</span><span class="info-hex" id="cmyYh">7F</span>
+      </div>
+    </div>
+    <div class="info-section">
+      <h2>HSB</h2>
+      <div class="info-grid">
+        <span class="info-label">H</span><span class="info-val" id="hsbH">0°</span><span class="info-hex" id="hsbHh">-</span>
+        <span class="info-label">S</span><span class="info-val" id="hsbS">0%</span><span class="info-hex" id="hsbSh">-</span>
+        <span class="info-label">B</span><span class="info-val" id="hsbB">50%</span><span class="info-hex" id="hsbBh">-</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-group complementary-group">
+    <h2>보색 (Complementary)</h2>
+    <div class="complementary-row">
+      <div class="color-preview" id="compPreview"></div>
+      <div class="complementary-info">
+        <div class="hex-display" id="compHex" title="클릭하여 복사">#7F7F7F</div>
+        <div class="comp-details">
+          <span class="info-label">R</span><span class="info-val" id="compR">127</span>
+          <span class="info-label">G</span><span class="info-val" id="compG">127</span>
+          <span class="info-label">B</span><span class="info-val" id="compB">127</span>
+        </div>
+        <div class="comp-name" id="compName">회색 / Gray</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="center" id="bgArea">
+  <div class="center-label" id="centerLabel">미리보기 영역</div>
+</div>
+
+<div class="panel right-panel">
+  <div class="color-name-box">
+    <h3>가장 가까운 색상 이름</h3>
+    <div class="name-exact" id="nameKo">회색</div>
+    <div class="name-sub" id="nameEn">Gray</div>
+    <div class="name-distance" id="nameDist"></div>
+  </div>
+  <div class="color-name-box">
+    <h3>유사한 색상 10개</h3>
+    <div class="nearest-list" id="nearestList"></div>
+  </div>
+</div>
+
+<div class="copy-toast" id="toast">클립보드에 복사되었습니다!</div>
+
+<script src="ColorPicker.js"></script>
+
+</body>
+</html>
