@@ -6,6 +6,9 @@ let sortCol = 'product';
 let sortAsc = true;
 let calcId = 0;
 
+const TABLE_LIMIT = 50_000;
+const COMPUTE_LIMIT = 500_000;
+
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach((el, i) => {
@@ -25,6 +28,29 @@ function applyPreset(numDice, faces) {
 
 function showLoading(show) {
   document.getElementById('loadingOverlay').classList.toggle('visible', show);
+}
+
+function analyticalExpectedValue(faces, numDice, isProduct) {
+  const mean = faces.reduce((a, b) => a + b, 0) / faces.length;
+  return isProduct ? Math.pow(mean, numDice) : mean * numDice;
+}
+
+function showExpectedValue(expectedValue, numberOfDice, faceSetOfDice, totalInfo, isProduct) {
+  document.getElementById('expectedSection').classList.add('visible');
+  const evStr = Number.isInteger(expectedValue)
+    ? expectedValue.toLocaleString()
+    : expectedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+  document.getElementById('expectedValue').textContent = evStr;
+  document.getElementById('summaryText').innerHTML = totalInfo;
+}
+
+function showTableError(message) {
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td colspan="5" class="table-error">${message}</td>`;
+  tbody.appendChild(tr);
+  document.getElementById('resultsSection').classList.add('visible');
 }
 
 function calculate() {
@@ -61,7 +87,6 @@ function calculate() {
   const thisCalcId = ++calcId;
   showLoading(true);
 
-  // Yield to browser for rendering the loading indicator, then compute
   setTimeout(() => {
     if (thisCalcId !== calcId) return;
 
@@ -79,7 +104,7 @@ function calculate() {
         }
       }
       dist = next;
-      if (dist.size > 100_000) {
+      if (dist.size > COMPUTE_LIMIT) {
         aborted = true;
         break;
       }
@@ -87,9 +112,17 @@ function calculate() {
 
     if (thisCalcId !== calcId) return;
 
+    const totalCombStr = BigInt(faceSetOfDice.length) ** BigInt(numberOfDice);
+
     if (aborted) {
-      document.getElementById('resultsSection').classList.remove('visible');
-      document.getElementById('expectedSection').classList.remove('visible');
+      const ev = analyticalExpectedValue(faceSetOfDice, numberOfDice, isProduct);
+      showExpectedValue(ev, numberOfDice, faceSetOfDice,
+        `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCombStr.toLocaleString()} total combinations`,
+        isProduct);
+      showTableError(
+        `Too many unique ${isProduct ? 'products' : 'sums'} to compute (over ${COMPUTE_LIMIT.toLocaleString()}).<br>` +
+        `Try fewer dice or fewer face values.`
+      );
       showLoading(false);
       return;
     }
@@ -120,6 +153,21 @@ function calculate() {
       row.prob = Number(row.count) / totalCountNum * 100;
     }
 
+    const totalInfo =
+      `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} total combinations<br>${rows.length} unique ${isProduct ? 'products' : 'sums'}`;
+
+    // Show expected value
+    showExpectedValue(expectedValue, numberOfDice, faceSetOfDice, totalInfo, isProduct);
+
+    if (rows.length > TABLE_LIMIT) {
+      showTableError(
+        `Too many unique ${isProduct ? 'products' : 'sums'} to display (${rows.length.toLocaleString()} rows, limit ${TABLE_LIMIT.toLocaleString()}).<br>` +
+        `The expected value is still shown above.`
+      );
+      showLoading(false);
+      return;
+    }
+
     currentRows = rows;
     currentMaxCount = maxCount;
     currentTotalCount = totalCount;
@@ -127,17 +175,8 @@ function calculate() {
     sortAsc = true;
     renderTable();
 
-    // Show results
     document.getElementById('resultsSection').classList.add('visible');
     document.getElementById('expectedSection').classList.add('visible');
-
-    // Format expected value
-    const evStr = Number.isInteger(expectedValue)
-      ? expectedValue.toLocaleString()
-      : expectedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
-    document.getElementById('expectedValue').textContent = evStr;
-    document.getElementById('summaryText').innerHTML =
-      `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} total combinations<br>${rows.length} unique ${isProduct ? 'products' : 'sums'}`;
 
     showLoading(false);
   }, 0);

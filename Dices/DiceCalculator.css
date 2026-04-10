@@ -290,6 +290,13 @@ th:first-child, td:first-child { text-align: left; }
   margin-top: 0.3rem;
   min-height: 1.1em;
 }
+.table-error {
+  text-align: center !important;
+  padding: 2.5rem 1rem !important;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
 .loading-overlay {
   display: none;
   position: fixed;
