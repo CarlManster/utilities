@@ -26,11 +26,11 @@ function calculate() {
   const errorEl = document.getElementById('diceError');
   const numberOfDice = parseInt(document.getElementById('numDice').value, 10);
   if (isNaN(numberOfDice) || numberOfDice < 1) {
-    errorEl.textContent = 'Please enter the number of dice (1~100).';
+    errorEl.textContent = 'Please enter the number of dice (1~30).';
     return;
   }
-  if (numberOfDice > 100) {
-    errorEl.textContent = 'Maximum 100 dice allowed.';
+  if (numberOfDice > 30) {
+    errorEl.textContent = 'Maximum 30 dice allowed.';
     return;
   }
   errorEl.textContent = '';
