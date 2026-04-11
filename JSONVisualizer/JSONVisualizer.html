@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Visualizer</title>
+<link rel="stylesheet" href="JSONVisualizer.css">
+</head>
+<body>
+
+<div class="main-layout">
+  <div class="viz-panel">
+    <div class="viz-toolbar">
+      <span class="viz-title">Visualization</span>
+      <button class="tool-btn" id="expandAll">Expand All</button>
+      <button class="tool-btn" id="collapseAll">Collapse All</button>
+      <button class="tool-btn" id="resetLayout">Reset Layout</button>
+      <button class="tool-btn" id="fitView">Fit to View</button>
+      <span class="zoom-controls">
+        <button class="tool-btn" id="zoomOut" title="Zoom Out">&minus;</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button class="tool-btn" id="zoomIn" title="Zoom In">&plus;</button>
+      </span>
+    </div>
+    <div class="viz-container" id="vizContainer">
+      <svg id="edgeSvg"></svg>
+      <div id="nodeLayer"></div>
+    </div>
+    <div class="viz-empty" id="vizEmpty">Enter JSON on the right to visualize</div>
+  </div>
+
+  <div class="divider" id="divider"></div>
+
+  <div class="input-panel">
+    <div class="input-toolbar">
+      <span class="input-title">JSON Input</span>
+      <button class="tool-btn" id="formatBtn">Format</button>
+      <button class="tool-btn" id="sampleBtn">Sample</button>
+    </div>
+    <textarea id="jsonInput" spellcheck="false" placeholder="Paste or type JSON here..."></textarea>
+    <div class="error-bar" id="errorBar"></div>
+  </div>
+</div>
+
+<script src="JSONVisualizer.js"></script>
+
+</body>
+</html>

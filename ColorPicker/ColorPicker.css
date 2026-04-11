@@ -120,6 +120,14 @@ h1 {
   color: #1a1a2e;
   margin-bottom: 4px;
 }
+.subtitle {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+.color-r { color: var(--color-red, #e74c3c); }
+.color-g { color: var(--color-green, #2ecc71); }
+.color-b { color: var(--color-blue, #3498db); }
 h2 {
   font-size: 15px;
   font-weight: 600;
@@ -389,6 +397,10 @@ input[type="range"]::-webkit-slider-thumb {
     background: rgba(30, 30, 35, 0.95);
   }
   h1 { color: #e8e8f0; }
+  .subtitle { color: #777; }
+  .color-r { --color-red: #ff6b6b; }
+  .color-g { --color-green: #51cf66; }
+  .color-b { --color-blue: #74c0fc; }
   h2 { color: #aaa; border-bottom-color: #444; }
   .hex-display { color: #e0e0e0; }
   .hex-display:hover { background: rgba(255,255,255,0.08); }
