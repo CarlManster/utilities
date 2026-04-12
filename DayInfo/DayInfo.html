@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day Info</title>
+<link rel="stylesheet" href="DayInfo.css">
+</head>
+<body>
+
+<div class="container">
+  <header class="header-row">
+    <div>
+      <h1>Day Info</h1>
+      <p class="subtitle">Solar / Lunar calendar conversion & holidays</p>
+    </div>
+    <button type="button" id="btnApiKey" class="btn-key" aria-label="API service key settings">API Key</button>
+  </header>
+
+  <div class="input-bar" role="group" aria-label="Date input">
+    <div class="input-field">
+      <label for="calType">Calendar</label>
+      <select id="calType" aria-label="Calendar type">
+        <option value="solar">Solar</option>
+        <option value="lunar">Lunar</option>
+      </select>
+    </div>
+    <div class="input-field">
+      <label for="yearInput">Year</label>
+      <input type="number" id="yearInput" aria-label="Year">
+    </div>
+    <div class="input-field">
+      <label for="monthSelect">Month</label>
+      <select id="monthSelect" aria-label="Month"></select>
+    </div>
+    <div class="input-field">
+      <label for="daySelect">Day</label>
+      <select id="daySelect" aria-label="Day"></select>
+    </div>
+    <div class="input-field">
+      <label for="tzSelect">Timezone</label>
+      <select id="tzSelect" aria-label="Timezone"></select>
+    </div>
+    <div class="input-field">
+      <label for="weekCount">WeekCount</label>
+      <select id="weekCount" aria-label="Week count">
+        <option value="3">3 week</option>
+        <option value="5">5 week</option>
+        <option value="7">7 week</option>
+      </select>
+    </div>
+    <div class="input-field leap-field" id="leapField" hidden>
+      <label for="leapCheck">
+        <input type="checkbox" id="leapCheck" aria-label="Leap month">
+        Leap
+      </label>
+    </div>
+    <div class="nav-buttons" role="group" aria-label="Date navigation">
+      <button type="button" id="btnPrev" aria-label="Previous day">&lt;</button>
+      <button type="button" id="btnToday" aria-label="Go to today">Today</button>
+      <button type="button" id="btnNext" aria-label="Next day">&gt;</button>
+    </div>
+    <div class="epoch-row">
+      <label for="epochInput">Epoch</label>
+      <input type="text" id="epochInput" inputmode="numeric" placeholder="e.g. 1744473600" aria-label="Epoch timestamp">
+      <button type="button" id="btnEpochGo" aria-label="Apply epoch">Go</button>
+      <div class="epoch-error" id="epochError" hidden></div>
+    </div>
+  </div>
+
+  <div class="info-banner" id="infoBanner" role="alert" hidden></div>
+
+  <section class="week-section" aria-label="Weekly calendar">
+    <div class="week-grid" id="weekGrid"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="DayInfo.js"></script>
+</body>
+</html>
