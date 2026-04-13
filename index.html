@@ -64,6 +64,7 @@
 Settings.ready.then(function() {
   var lang = Settings.get('lang') || 'en';
   document.documentElement.lang = lang === 'jp' ? 'ja' : lang;
+  I18N.setLang(lang);
 
   /* ── Settings panel toggle ── */
   var overlay = document.getElementById('settingsOverlay');
