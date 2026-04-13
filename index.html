@@ -40,6 +40,14 @@
         <option value="DayInfo/DayInfo.html" data-i18n="page_dayinfo">Day Info</option>
       </select>
     </div>
+    <div class="settings-group">
+      <div class="settings-label" data-i18n="settings_screenmode">Screen Mode</div>
+      <select class="settings-select" id="screenModeSelect">
+        <option value="auto" data-i18n="mode_auto">Auto</option>
+        <option value="light" data-i18n="mode_light">Light</option>
+        <option value="dark" data-i18n="mode_dark">Dark</option>
+      </select>
+    </div>
   </div>
 </div>
 
@@ -88,6 +96,43 @@ Settings.ready.then(function() {
 
   dpSel.addEventListener('change', function() {
     Settings.set('defaultpage', this.value);
+  });
+
+  /* ── Screen mode ── */
+  var smSel = document.getElementById('screenModeSelect');
+  var savedMode = Settings.get('screenmode') || 'auto';
+  smSel.value = savedMode;
+  applyScreenMode(savedMode);
+
+  smSel.addEventListener('change', function() {
+    var mode = this.value;
+    Settings.set('screenmode', mode);
+    applyScreenMode(mode);
+  });
+
+  function applyScreenMode(mode) {
+    document.documentElement.removeAttribute('data-theme');
+    if (mode === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else if (mode === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    // Propagate to iframe
+    try {
+      var iframeDoc = document.getElementById('content').contentDocument;
+      if (iframeDoc) {
+        iframeDoc.documentElement.removeAttribute('data-theme');
+        if (mode !== 'auto') iframeDoc.documentElement.setAttribute('data-theme', mode);
+      }
+    } catch(e) {}
+  }
+
+  // Also apply mode when iframe loads
+  document.getElementById('content').addEventListener('load', function() {
+    var mode = Settings.get('screenmode') || 'auto';
+    try {
+      var iframeDoc = this.contentDocument;
+      if (iframeDoc && mode !== 'auto') {
+        iframeDoc.documentElement.setAttribute('data-theme', mode);
+      }
+    } catch(e) {}
   });
 
   /* ── Initial page load ── */

@@ -14,5 +14,9 @@
   "page_dice": "Dice Calculator",
   "page_color": "Color Picker",
   "page_json": "JSON Visualizer",
-  "page_dayinfo": "Day Info"
+  "page_dayinfo": "Day Info",
+  "settings_screenmode": "Screen Mode",
+  "mode_auto": "Auto",
+  "mode_light": "Light",
+  "mode_dark": "Dark"
 }

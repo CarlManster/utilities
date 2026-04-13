@@ -14,5 +14,9 @@
   "page_dice": "주사위 계산기",
   "page_color": "색상 피커",
   "page_json": "JSON 시각화",
-  "page_dayinfo": "날짜 정보"
+  "page_dayinfo": "날짜 정보",
+  "settings_screenmode": "화면 모드",
+  "mode_auto": "자동",
+  "mode_light": "라이트",
+  "mode_dark": "다크"
 }

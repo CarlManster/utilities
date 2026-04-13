@@ -431,3 +431,35 @@ input[type="range"]::-webkit-slider-thumb {
   input[type="range"]::-webkit-slider-thumb { border-color: #333; }
   .comp-name { color: #aaa; }
 }
+:root[data-theme="dark"] .left-panel,
+:root[data-theme="dark"] .right-panel { background: rgba(30,30,35,0.95); }
+:root[data-theme="dark"] h1 { color: #e8e8f0; }
+:root[data-theme="dark"] .subtitle { color: #777; }
+:root[data-theme="dark"] .color-r { --color-red: #ff6b6b; }
+:root[data-theme="dark"] .color-g { --color-green: #51cf66; }
+:root[data-theme="dark"] .color-b { --color-blue: #74c0fc; }
+:root[data-theme="dark"] h2 { color: #aaa; border-bottom-color: #444; }
+:root[data-theme="dark"] .hex-display { color: #e0e0e0; }
+:root[data-theme="dark"] .hex-display:hover { background: rgba(255,255,255,0.08); }
+:root[data-theme="dark"] .hex-display:active { background: rgba(255,255,255,0.15); }
+:root[data-theme="dark"] .num-input { background: #2a2a30; color: #e0e0e0; border-color: #555; }
+:root[data-theme="dark"] .num-input:focus { border-color: #888; }
+:root[data-theme="dark"] .color-preview { border-color: rgba(255,255,255,0.15); }
+:root[data-theme="dark"] .info-section { background: #252528; }
+:root[data-theme="dark"] .info-label { color: #aaa; }
+:root[data-theme="dark"] .info-val { color: #e0e0e0; }
+:root[data-theme="dark"] .info-hex { color: #999; }
+:root[data-theme="dark"] .color-name-box { background: #252528; }
+:root[data-theme="dark"] .color-name-box h3 { color: #888; }
+:root[data-theme="dark"] .name-exact { color: #e8e8f0; }
+:root[data-theme="dark"] .name-sub { color: #bbb; }
+:root[data-theme="dark"] .name-distance { color: #777; }
+:root[data-theme="dark"] .nearest-item { background: #2a2a30; }
+:root[data-theme="dark"] .nearest-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+:root[data-theme="dark"] .nearest-name-ko { color: #e8e8f0; }
+:root[data-theme="dark"] .nearest-name-en { color: #999; }
+:root[data-theme="dark"] .nearest-hex { color: #777; }
+:root[data-theme="dark"] .nearest-swatch { border-color: rgba(255,255,255,0.15); }
+:root[data-theme="dark"] .swatch { border-color: rgba(255,255,255,0.2); }
+:root[data-theme="dark"] input[type="range"]::-webkit-slider-thumb { border-color: #333; }
+:root[data-theme="dark"] .comp-name { color: #aaa; }

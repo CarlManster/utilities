@@ -15,7 +15,11 @@ I18N.register({
     "page_dice": "Dice Calculator",
     "page_color": "Color Picker",
     "page_json": "JSON Visualizer",
-    "page_dayinfo": "Day Info"
+    "page_dayinfo": "Day Info",
+    "settings_screenmode": "Screen Mode",
+    "mode_auto": "Auto",
+    "mode_light": "Light",
+    "mode_dark": "Dark"
   },
   "ko": {
     "brand": "Utilities",
@@ -33,7 +37,11 @@ I18N.register({
     "page_dice": "주사위 계산기",
     "page_color": "색상 피커",
     "page_json": "JSON 시각화",
-    "page_dayinfo": "날짜 정보"
+    "page_dayinfo": "날짜 정보",
+    "settings_screenmode": "화면 모드",
+    "mode_auto": "자동",
+    "mode_light": "라이트",
+    "mode_dark": "다크"
   },
   "jp": {
     "brand": "Utilities",
@@ -51,6 +59,10 @@ I18N.register({
     "page_dice": "サイコロ計算機",
     "page_color": "カラーピッカー",
     "page_json": "JSONビジュアライザー",
-    "page_dayinfo": "日付情報"
+    "page_dayinfo": "日付情報",
+    "settings_screenmode": "画面モード",
+    "mode_auto": "自動",
+    "mode_light": "ライト",
+    "mode_dark": "ダーク"
   }
 });

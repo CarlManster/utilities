@@ -99,23 +99,24 @@ nav .nav-link.active {
 
 .settings-panel {
   position: fixed;
-  top: 48px;
-  right: 0;
+  top: 56px;
+  right: 20px;
   width: 280px;
   background: var(--nav-bg);
-  border-left: 1px solid rgba(255,255,255,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  border-radius: 0 0 0 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
   padding: 20px;
   z-index: 100;
-  box-shadow: -4px 4px 20px rgba(0,0,0,0.3);
-  transform: translateX(100%);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  transform: translateY(-8px);
   opacity: 0;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
 }
 .settings-overlay.open .settings-panel {
-  transform: translateX(0);
+  transform: translateY(0);
   opacity: 1;
+  pointer-events: auto;
 }
 
 .settings-title {

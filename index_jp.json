@@ -14,5 +14,9 @@
   "page_dice": "サイコロ計算機",
   "page_color": "カラーピッカー",
   "page_json": "JSONビジュアライザー",
-  "page_dayinfo": "日付情報"
+  "page_dayinfo": "日付情報",
+  "settings_screenmode": "画面モード",
+  "mode_auto": "自動",
+  "mode_light": "ライト",
+  "mode_dark": "ダーク"
 }
