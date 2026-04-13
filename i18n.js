@@ -9,18 +9,14 @@ var I18N = (function () {
   function setLang(lang) {
     _data = _allLangs[lang] || _allLangs['en'] || {};
     applyDOM();
-    document.dispatchEvent(new Event('i18n-loaded'));
   }
 
   function getLang() {
-    return new URLSearchParams(location.search).get('lang')
-      || (document.cookie.match(/(^|;\s*)utilities_lang=([^;]*)/) || [])[2]
-      || 'en';
-  }
-
-  function init(langs) {
-    register(langs);
-    setLang(getLang());
+    try {
+      var u = new URLSearchParams(location.search).get('lang');
+      if (u) return u;
+    } catch (e) {}
+    return 'en';
   }
 
   function applyDOM() {
@@ -57,5 +53,5 @@ var I18N = (function () {
     return s;
   }
 
-  return { init: init, setLang: setLang, getLang: getLang, t: t, apply: applyDOM };
+  return { register: register, setLang: setLang, getLang: getLang, t: t, apply: applyDOM };
 })();

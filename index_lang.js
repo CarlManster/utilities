@@ -1,4 +1,4 @@
-I18N.init({
+I18N.register({
   "en": {
     "brand": "Utilities",
     "nav_dice": "Dice Calculator",

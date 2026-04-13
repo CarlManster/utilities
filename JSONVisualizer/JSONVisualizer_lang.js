@@ -1,4 +1,4 @@
-I18N.init({
+I18N.register({
   "en": {
     "title": "JSON Visualizer",
     "visualization": "Visualization",

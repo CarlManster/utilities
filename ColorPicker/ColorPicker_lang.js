@@ -1,4 +1,4 @@
-I18N.init({
+I18N.register({
   "en": {
     "title": "RGB Color Picker",
     "subtitle": "Adjust color using the sliders",

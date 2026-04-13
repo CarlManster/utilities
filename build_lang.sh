@@ -27,7 +27,7 @@ pages.forEach(function(page) {
     }
   });
   var out = path.join(page.dir, page.name + '_lang.js');
-  fs.writeFileSync(out, 'I18N.init(' + JSON.stringify(data, null, 2) + ');\n');
+  fs.writeFileSync(out, 'I18N.register(' + JSON.stringify(data, null, 2) + ');\n');
   console.log('Generated: ' + out);
 });
 "

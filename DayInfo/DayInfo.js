@@ -295,18 +295,15 @@ var divisionsCache = {};
 var fetchingMonths = {};
 
 function getServiceKey() {
-  var match = document.cookie.match(/(^|;\s*)dayinfo_key=([^;]*)/);
-  return match ? decodeURIComponent(match[2]) : '';
+  return Settings.get('dayInfo.apikey') || '';
 }
 
 function setServiceKey(key) {
-  var d = new Date();
-  d.setFullYear(d.getFullYear() + 1);
-  document.cookie = 'dayinfo_key=' + encodeURIComponent(key) + ';expires=' + d.toUTCString() + ';path=/';
+  Settings.set('dayInfo.apikey', key);
 }
 
 function removeServiceKey() {
-  document.cookie = 'dayinfo_key=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  Settings.set('dayInfo.apikey', '');
 }
 
 var apiKeyError = false;
@@ -919,6 +916,6 @@ weekGrid.addEventListener('click', function (e) {
   });
 });
 
-init();
+Settings.ready.then(function () { init(); });
 
 })();

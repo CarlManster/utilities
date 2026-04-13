@@ -1,4 +1,4 @@
-I18N.init({
+I18N.register({
   "en": {
     "title": "Dice Expected Value Calculator",
     "expected_value": "Expected Value",
