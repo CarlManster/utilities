@@ -47,7 +47,15 @@
 
   sel.addEventListener('change', function() { applyLang(this.value); });
 
-  // Initial iframe load
+  // Initial iframe load — restore last visited page
+  var savedPage = getSavedPage();
+  if (savedPage) {
+    var match = document.querySelector('.nav-link[data-src="' + savedPage + '"]');
+    if (match) {
+      document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.remove('active'); });
+      match.classList.add('active');
+    }
+  }
   var active = document.querySelector('.nav-link.active');
   var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
   document.getElementById('content').src = base + '?lang=' + saved;
