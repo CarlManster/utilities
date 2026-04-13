@@ -106,16 +106,22 @@ var Settings = (function () {
         if (migrateOld()) return save();
       }
     }).then(function () {
-      // Apply language via URL param override
+      // Apply URL param overrides
       try {
-        var urlLang = new URLSearchParams(location.search).get('lang');
+        var params = new URLSearchParams(location.search);
+        var urlLang = params.get('lang');
+        var urlTheme = params.get('theme');
         if (urlLang) _data.lang = urlLang;
+        if (urlTheme) _data.screenmode = urlTheme;
       } catch (e) {}
 
       // Set I18N language
       if (typeof I18N !== 'undefined' && I18N.setLang) {
         I18N.setLang(_data.lang || 'en');
       }
+
+      // Apply screen mode
+      applyScreenMode(_data.screenmode || 'auto');
 
       _readyResolve();
     }).catch(function () {
@@ -151,8 +157,16 @@ var Settings = (function () {
     return save();
   }
 
+  /* -- Screen mode -- */
+  function applyScreenMode(mode) {
+    document.documentElement.removeAttribute('data-theme');
+    if (mode === 'light' || mode === 'dark') {
+      document.documentElement.setAttribute('data-theme', mode);
+    }
+  }
+
   // Auto-init
   init();
 
-  return { ready: _ready, get: get, set: set, save: save };
+  return { ready: _ready, get: get, set: set, save: save, applyScreenMode: applyScreenMode };
 })();

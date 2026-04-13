@@ -85,7 +85,7 @@ Settings.ready.then(function() {
       var iframe = document.getElementById('content');
       var active = document.querySelector('.nav-link.active');
       var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
-      iframe.src = base + '?lang=' + newLang;
+      iframe.src = base + iframeParams();
     });
   });
 
@@ -100,39 +100,16 @@ Settings.ready.then(function() {
 
   /* ── Screen mode ── */
   var smSel = document.getElementById('screenModeSelect');
-  var savedMode = Settings.get('screenmode') || 'auto';
-  smSel.value = savedMode;
-  applyScreenMode(savedMode);
+  smSel.value = Settings.get('screenmode') || 'auto';
 
   smSel.addEventListener('change', function() {
     var mode = this.value;
     Settings.set('screenmode', mode);
-    applyScreenMode(mode);
-  });
-
-  function applyScreenMode(mode) {
-    document.documentElement.removeAttribute('data-theme');
-    if (mode === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    else if (mode === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    // Propagate to iframe
-    try {
-      var iframeDoc = document.getElementById('content').contentDocument;
-      if (iframeDoc) {
-        iframeDoc.documentElement.removeAttribute('data-theme');
-        if (mode !== 'auto') iframeDoc.documentElement.setAttribute('data-theme', mode);
-      }
-    } catch(e) {}
-  }
-
-  // Also apply mode when iframe loads
-  document.getElementById('content').addEventListener('load', function() {
-    var mode = Settings.get('screenmode') || 'auto';
-    try {
-      var iframeDoc = this.contentDocument;
-      if (iframeDoc && mode !== 'auto') {
-        iframeDoc.documentElement.setAttribute('data-theme', mode);
-      }
-    } catch(e) {}
+    Settings.applyScreenMode(mode);
+    var iframe = document.getElementById('content');
+    var active = document.querySelector('.nav-link.active');
+    var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
+    iframe.src = base + iframeParams();
   });
 
   /* ── Initial page load ── */
@@ -149,7 +126,7 @@ Settings.ready.then(function() {
     document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.remove('active'); });
     match.classList.add('active');
   }
-  document.getElementById('content').src = page + '?lang=' + lang;
+  document.getElementById('content').src = page + iframeParams();
 });
 </script>
 

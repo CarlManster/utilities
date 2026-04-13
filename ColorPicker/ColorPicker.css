@@ -463,3 +463,37 @@ input[type="range"]::-webkit-slider-thumb {
 :root[data-theme="dark"] .swatch { border-color: rgba(255,255,255,0.2); }
 :root[data-theme="dark"] input[type="range"]::-webkit-slider-thumb { border-color: #333; }
 :root[data-theme="dark"] .comp-name { color: #aaa; }
+
+/* Force light mode overrides */
+:root[data-theme="light"] .left-panel,
+:root[data-theme="light"] .right-panel { background: rgba(255,255,255,0.92); }
+:root[data-theme="light"] h1 { color: #1a1a2e; }
+:root[data-theme="light"] .subtitle { color: #888; }
+:root[data-theme="light"] .color-r { --color-red: #e74c3c; }
+:root[data-theme="light"] .color-g { --color-green: #2ecc71; }
+:root[data-theme="light"] .color-b { --color-blue: #3498db; }
+:root[data-theme="light"] h2 { color: #555; border-bottom-color: #eee; }
+:root[data-theme="light"] .hex-display { color: #333; }
+:root[data-theme="light"] .hex-display:hover { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .hex-display:active { background: rgba(0,0,0,0.12); }
+:root[data-theme="light"] .num-input { background: #fff; color: inherit; border-color: #ccc; }
+:root[data-theme="light"] .num-input:focus { border-color: #888; }
+:root[data-theme="light"] .color-preview { border-color: rgba(0,0,0,0.1); }
+:root[data-theme="light"] .info-section { background: #f8f8f8; }
+:root[data-theme="light"] .info-label { color: #555; }
+:root[data-theme="light"] .info-val { color: #222; }
+:root[data-theme="light"] .info-hex { color: #666; }
+:root[data-theme="light"] .color-name-box { background: #f8f8f8; }
+:root[data-theme="light"] .color-name-box h3 { color: #888; }
+:root[data-theme="light"] .name-exact { color: #1a1a2e; }
+:root[data-theme="light"] .name-sub { color: #555; }
+:root[data-theme="light"] .name-distance { color: #999; }
+:root[data-theme="light"] .nearest-item { background: #fff; }
+:root[data-theme="light"] .nearest-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+:root[data-theme="light"] .nearest-name-ko { color: #222; }
+:root[data-theme="light"] .nearest-name-en { color: #888; }
+:root[data-theme="light"] .nearest-hex { color: #aaa; }
+:root[data-theme="light"] .nearest-swatch { border-color: rgba(0,0,0,0.1); }
+:root[data-theme="light"] .swatch { border-color: rgba(0,0,0,0.15); }
+:root[data-theme="light"] input[type="range"]::-webkit-slider-thumb { border-color: #fff; }
+:root[data-theme="light"] .comp-name { color: #666; }
