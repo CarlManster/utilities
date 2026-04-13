@@ -1,0 +1,19 @@
+{
+  "title": "RGB Color Picker",
+  "subtitle": "Adjust color using the sliders",
+  "red": "RED",
+  "green": "GREEN",
+  "blue": "BLUE",
+  "rgb": "RGB",
+  "cmy": "CMY",
+  "hsb": "HSB",
+  "click_to_copy": "Click to copy",
+  "complementary": "Complementary",
+  "closest_name": "Closest Color Name",
+  "similar_10": "10 Similar Colors",
+  "copied": "Copied to clipboard!",
+  "preview_area": "Preview area",
+  "exact_match": "Exact match!",
+  "distance_prefix": "Distance: ",
+  "distance_suffix": " (closer = more similar)"
+}

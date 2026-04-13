@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +8,14 @@
 </head>
 <body>
 
-<h1>Dice Expected Value Calculator</h1>
+<h1 data-i18n="title">Dice Expected Value Calculator</h1>
 
 <div class="main-layout">
 
 <div class="right-column">
 
 <div class="expected-section" id="expectedSection">
-  <div class="expected-label">Expected Value</div>
+  <div class="expected-label" data-i18n="expected_value">Expected Value</div>
   <div class="expected-value" id="expectedValue"></div>
   <div class="summary" id="summaryText"></div>
 </div>
@@ -24,26 +24,26 @@
   <div class="input-group">
     <div class="split-row">
       <div>
-        <label for="numDice">Number of Dice</label>
-        <div class="hint">How many dice to roll</div>
+        <label for="numDice" data-i18n="num_dice">Number of Dice</label>
+        <div class="hint" data-i18n="num_dice_hint">How many dice to roll</div>
         <input type="number" id="numDice" value="3" min="1" max="20" oninput="calculate()">
         <div class="error-msg" id="diceError"></div>
       </div>
       <div>
-        <label>Operation</label>
-        <div class="hint">How to combine dice</div>
+        <label data-i18n="operation">Operation</label>
+        <div class="hint" data-i18n="operation_hint">How to combine dice</div>
         <div class="radio-group">
-          <label><input type="radio" name="operation" value="product" checked onchange="calculate()"> Product</label>
-          <label><input type="radio" name="operation" value="sum" onchange="calculate()"> Sum</label>
+          <label><input type="radio" name="operation" value="product" checked onchange="calculate()"> <span data-i18n="op_product">Product</span></label>
+          <label><input type="radio" name="operation" value="sum" onchange="calculate()"> <span data-i18n="op_sum">Sum</span></label>
         </div>
       </div>
     </div>
   </div>
   <div class="input-group">
-    <label>Face Values</label>
+    <label data-i18n="face_values">Face Values</label>
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('csv')">Comma-separated</button>
-      <button class="tab" onclick="switchTab('range')">Range (start/end)</button>
+      <button class="tab active" onclick="switchTab('csv')" data-i18n="face_values_hint">Comma-separated</button>
+      <button class="tab" onclick="switchTab('range')" data-i18n="range_label">Range (start/end)</button>
     </div>
     <div class="tab-content">
       <div class="tab-pane active" id="tabCsv">
@@ -51,7 +51,7 @@
         <input type="text" id="faceValues" value="1,2,3,4,5,6" oninput="calculate()">
       </div>
       <div class="tab-pane" id="tabRange">
-        <div class="hint">Generate consecutive integers from start to end</div>
+        <div class="hint" data-i18n="range_hint">Generate consecutive integers from start to end</div>
         <div class="range-row">
           <label for="rangeStart">Start</label>
           <input type="number" id="rangeStart" value="1" oninput="calculate()">
@@ -62,10 +62,10 @@
     </div>
   </div>
   <div class="input-group">
-    <label>Presets</label>
+    <label data-i18n="presets">Presets</label>
     <div class="presets">
-      <button class="preset-btn" onclick="applyPreset(2,'1,2,3,4,5,6')">2d6 — two standard dice</button>
-      <button class="preset-btn" onclick="applyPreset(3,'1,2,3,4,5,6')">3d6 — three standard dice</button>
+      <button class="preset-btn" onclick="applyPreset(2,'1,2,3,4,5,6')" data-i18n="preset_2d6">2d6 — two standard dice</button>
+      <button class="preset-btn" onclick="applyPreset(3,'1,2,3,4,5,6')" data-i18n="preset_3d6">3d6 — three standard dice</button>
       <button class="preset-btn" onclick="applyPreset(2,'1,2,3,4,5,6,7,8,9,10,11,12')">2d12 — two dodecahedral</button>
       <button class="preset-btn" onclick="applyPreset(4,'1,2,3,4,5,6,7,8,9,10,11,12')">4d12 — four dodecahedral</button>
       <button class="preset-btn" onclick="applyPreset(3,'-1,1,2,3,4,6')">3d[-1,1,2,3,4,6] — custom faces</button>
@@ -77,16 +77,16 @@
 </div><!-- end right-column -->
 
 <div class="results-section" id="resultsSection">
-  <h2>All Possible Outcomes</h2>
+  <h2 data-i18n="all_outcomes">All Possible Outcomes</h2>
   <div class="table-wrapper">
     <table>
       <thead>
         <tr>
-          <th data-col="rank" onclick="sortTable('rank')">Rank <span class="sort-arrow"></span></th>
-          <th data-col="product" id="resultHeader" onclick="sortTable('product')">Product <span class="sort-arrow"></span></th>
-          <th data-col="count" onclick="sortTable('count')">Count <span class="sort-arrow"></span></th>
-          <th data-col="prob" onclick="sortTable('prob')">Probability <span class="sort-arrow"></span></th>
-          <th data-col="dist" class="bar-cell" onclick="sortTable('dist')">Distribution <span class="sort-arrow"></span></th>
+          <th data-col="rank" onclick="sortTable('rank')"><span data-i18n="rank">Rank</span> <span class="sort-arrow"></span></th>
+          <th data-col="product" id="resultHeader" onclick="sortTable('product')"><span data-i18n="op_product">Product</span> <span class="sort-arrow"></span></th>
+          <th data-col="count" onclick="sortTable('count')"><span data-i18n="count">Count</span> <span class="sort-arrow"></span></th>
+          <th data-col="prob" onclick="sortTable('prob')"><span data-i18n="probability">Probability</span> <span class="sort-arrow"></span></th>
+          <th data-col="dist" class="bar-cell" onclick="sortTable('dist')"><span data-i18n="distribution">Distribution</span> <span class="sort-arrow"></span></th>
         </tr>
       </thead>
       <tbody id="resultsBody"></tbody>
@@ -98,10 +98,12 @@
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
-  <div class="loading-text">Calculating...</div>
+  <div class="loading-text" data-i18n="calculating">Calculating...</div>
 </div>
 
+<script src="../i18n.js"></script>
 <script src="DiceCalculator.js"></script>
+<script>I18N.load('DiceCalculator_en.json');</script>
 
 </body>
 </html>

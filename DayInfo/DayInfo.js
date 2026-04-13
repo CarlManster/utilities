@@ -35,6 +35,9 @@ var LUNAR_INFO = [
 var LY_MIN = 1900;
 var LY_MAX = 2100;
 var DAY_MS = 86400000;
+function DOW_SHORT_ARR() { var a = I18N.t('dow_short'); return Array.isArray(a) ? a : DOW_SHORT; }
+function DOW_FULL_ARR()  { var a = I18N.t('dow_full');  return Array.isArray(a) ? a : DOW_FULL; }
+function MONTH_SHORT_ARR() { var a = I18N.t('month_short'); return Array.isArray(a) ? a : MONTH_SHORT; }
 var DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var DOW_FULL  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var MONTH_SHORT = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -313,12 +316,12 @@ function updateKeyButton() {
   btn.classList.remove('active', 'error');
   if (apiKeyError) {
     btn.classList.add('error');
-    btn.textContent = 'API Key Error';
+    btn.textContent = I18N.t('api_key_error', 'API Key Error');
   } else if (getServiceKey()) {
     btn.classList.add('active');
-    btn.textContent = 'API Key Set';
+    btn.textContent = I18N.t('api_key_set', 'API Key Set');
   } else {
-    btn.textContent = 'API Key';
+    btn.textContent = I18N.t('api_key', 'API Key');
   }
 }
 
@@ -341,8 +344,8 @@ function checkApiResponse(data) {
 function promptServiceKey() {
   var current = getServiceKey();
   var msg = current
-    ? 'Enter your service key.\n(Leave empty to remove the key.)'
-    : 'Enter your service key.\n(Encoded key from data.go.kr)';
+    ? I18N.t('prompt_edit_key', 'Enter your service key.\n(Leave empty to remove the key.)')
+    : I18N.t('prompt_enter_key', 'Enter your service key.\n(Encoded key from data.go.kr)');
   var key = prompt(msg, current);
   if (key === null) return;
   apiKeyError = false;
@@ -525,7 +528,8 @@ function init() {
   yearInput.value = now.getFullYear();
 
   for (var m = 1; m <= 12; m++) {
-    monthSelect.add(new Option(MONTH_SHORT[m], m));
+    var _m = MONTH_SHORT_ARR();
+    monthSelect.add(new Option(_m[m] || MONTH_SHORT[m], m));
   }
   monthSelect.value = now.getMonth() + 1;
 
@@ -562,6 +566,11 @@ function init() {
   });
   document.getElementById('epochInput').addEventListener('input', validateEpochInput);
 
+  document.addEventListener('i18n-loaded', function () {
+    updateKeyButton();
+    render();
+  });
+
   updateKeyButton();
   render();
 }
@@ -570,7 +579,7 @@ function onYearChange() {
   clearEpochError();
   var v = parseInt(yearInput.value, 10);
   if (!isNaN(v) && (v < 1 || v > 5000)) {
-    showEpochError('Year must be between 1 and 5000.');
+    showEpochError(I18N.t('error_year_range', 'Year must be between 1 and 5000.'));
     return;
   }
   refreshLeap();
@@ -638,11 +647,11 @@ function validateEpochInput() {
   if (raw === '') return;
   var epoch = Number(raw);
   if (!Number.isFinite(epoch) || Math.floor(epoch) !== epoch) {
-    showEpochError('Invalid value. Please enter an integer (seconds).');
+    showEpochError(I18N.t('error_invalid_epoch', 'Invalid value. Please enter an integer (seconds).'));
   } else {
     var r = epochRange();
     if (epoch < r.min || epoch > r.max) {
-      showEpochError('Out of range. Must be between year 1 and year 5000 (' + fmtTz(parseInt(tzSelect.value,10)) + ').');
+      showEpochError(I18N.t('error_epoch_range', 'Out of range. Must be between year 1 and year 5000 (' + fmtTz(parseInt(tzSelect.value,10)) + ').', {tz: fmtTz(parseInt(tzSelect.value,10))}));
     }
   }
 }
@@ -657,13 +666,13 @@ function applyEpoch() {
 
   var epoch = Number(raw);
   if (!Number.isFinite(epoch) || Math.floor(epoch) !== epoch) {
-    showEpochError('Invalid value. Please enter an integer (seconds).');
+    showEpochError(I18N.t('error_invalid_epoch', 'Invalid value. Please enter an integer (seconds).'));
     return;
   }
 
   var r = epochRange();
   if (epoch < r.min || epoch > r.max) {
-    showEpochError('Out of range. Must be between year 1 and year 5000 (' + fmtTz(parseInt(tzSelect.value,10)) + ').');
+    showEpochError(I18N.t('error_epoch_range', 'Out of range. Must be between year 1 and year 5000 (' + fmtTz(parseInt(tzSelect.value,10)) + ').', {tz: fmtTz(parseInt(tzSelect.value,10))}));
     return;
   }
 
@@ -673,7 +682,7 @@ function applyEpoch() {
   var g = jdToGregorian(jd);
 
   if (g.year < 1 || g.year > 5000) {
-    showEpochError('Out of range. Must be between year 1 and year 5000 (' + fmtTz(tzOffsetMin) + ').');
+    showEpochError(I18N.t('error_epoch_range', 'Out of range. Must be between year 1 and year 5000 (' + fmtTz(tzOffsetMin) + ').', {tz: fmtTz(tzOffsetMin)}));
     return;
   }
 
@@ -746,7 +755,7 @@ function render() {
   if (isLunar) {
     var conv = lunarToSolar(y, m, d, isLeap);
     if (!conv) {
-      showBanner('Unable to convert the given lunar date.');
+      showBanner(I18N.t('error_lunar_convert', 'Unable to convert the given lunar date.'));
       weekGrid.innerHTML = '';
       return;
     }
@@ -808,25 +817,26 @@ function render() {
     if (dow === 0 || isHoliday) card.classList.add('holiday');
     else if (dow === 6) card.classList.add('saturday');
 
+    var _dow = DOW_SHORT_ARR(); var _dowF = DOW_FULL_ARR(); var _mon = MONTH_SHORT_ARR();
     var html = '';
-    html += '<div class="day-dow">' + DOW_SHORT[dow];
+    html += '<div class="day-dow">' + (_dow[dow] || DOW_SHORT[dow]);
     if (division) html += '<span class="day-division">' + division + '</span>';
     html += '</div>';
     html += '<div class="day-num">' + sd + '</div>';
-    html += '<div class="day-date"><span class="date-label">Solar</span>' + fmtDate(sy, sm, sd) + '</div>';
+    html += '<div class="day-date"><span class="date-label">' + I18N.t('label_solar', 'Solar') + '</span>' + fmtDate(sy, sm, sd) + '</div>';
 
     if (lunar) {
-      var leapMark = lunar.isLeap ? ' (Leap)' : '';
-      var approxMark = lunar.approx ? ' (?)' : '';
-      html += '<div class="day-lunar"><span class="date-label">Lunar</span>' + fmtDate(lunar.year, lunar.month, lunar.day) + leapMark + approxMark + '</div>';
+      var leapMark = lunar.isLeap ? I18N.t('lunar_leap', ' (Leap)') : '';
+      var approxMark = lunar.approx ? I18N.t('lunar_approx', ' (?)') : '';
+      html += '<div class="day-lunar"><span class="date-label">' + I18N.t('label_lunar', 'Lunar') + '</span>' + fmtDate(lunar.year, lunar.month, lunar.day) + leapMark + approxMark + '</div>';
     } else {
-      html += '<div class="day-lunar dim"><span class="date-label">Lunar</span>N/A</div>';
+      html += '<div class="day-lunar dim"><span class="date-label">' + I18N.t('label_lunar', 'Lunar') + '</span>' + I18N.t('lunar_na', 'N/A') + '</div>';
     }
 
     var tzOffsetMin = parseInt(tzSelect.value, 10);
     var epoch = Math.round((gregorianToJD(sy, sm, sd) - 2440587.5) * 86400) - tzOffsetMin * 60;
-    html += '<div class="day-epoch" data-epoch="' + epoch + '" title="Click to copy">'
-          + '<span class="epoch-label">Timestamp</span>'
+    html += '<div class="day-epoch" data-epoch="' + epoch + '" data-i18n-title="click_to_copy" title="' + I18N.t('click_to_copy', 'Click to copy') + '">'
+          + '<span class="epoch-label">' + I18N.t('label_timestamp', 'Timestamp') + '</span>'
           + '<span class="epoch-value">' + epoch + '</span></div>';
 
     for (var h = 0; h < holidays.length; h++) {
@@ -836,10 +846,10 @@ function render() {
     card.innerHTML = html;
 
     card.setAttribute('aria-label',
-      DOW_FULL[dow] + ', ' + MONTH_SHORT[sm] + ' ' + sd + ', ' + sy +
+      (_dowF[dow] || DOW_FULL[dow]) + ', ' + (_mon[sm] || MONTH_SHORT[sm]) + ' ' + sd + ', ' + sy +
       (holidays.length ? ', ' + holidays.join(', ') : '') +
-      (isSelected ? ' (selected)' : '') +
-      (isToday ? ' (today)' : '')
+      (isSelected ? ' ' + I18N.t('aria_selected', '(selected)') : '') +
+      (isToday ? ' ' + I18N.t('aria_today', '(today)') : '')
     );
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
@@ -910,7 +920,7 @@ weekGrid.addEventListener('click', function (e) {
   e.stopPropagation();
   var val = epochEl.getAttribute('data-epoch');
   navigator.clipboard.writeText(val).then(function () {
-    showToast('Copied: ' + val);
+    showToast(I18N.t('copied', 'Copied: ' + val, {value: val}));
   });
 });
 

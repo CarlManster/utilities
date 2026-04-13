@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,38 +11,40 @@
 <div class="main-layout">
   <div class="viz-panel">
     <div class="viz-toolbar">
-      <span class="viz-title">Visualization</span>
-      <button class="tool-btn" id="expandAll">Expand All</button>
-      <button class="tool-btn" id="collapseAll">Collapse All</button>
-      <button class="tool-btn" id="resetLayout">Reset Layout</button>
-      <button class="tool-btn" id="fitView">Fit to View</button>
+      <span class="viz-title" data-i18n="visualization">Visualization</span>
+      <button class="tool-btn" id="expandAll" data-i18n="expand_all">Expand All</button>
+      <button class="tool-btn" id="collapseAll" data-i18n="collapse_all">Collapse All</button>
+      <button class="tool-btn" id="resetLayout" data-i18n="reset_layout">Reset Layout</button>
+      <button class="tool-btn" id="fitView" data-i18n="fit_to_view">Fit to View</button>
       <span class="zoom-controls">
-        <button class="tool-btn" id="zoomOut" title="Zoom Out">&minus;</button>
+        <button class="tool-btn" id="zoomOut" data-i18n-title="zoom_out" title="Zoom Out">&minus;</button>
         <span class="zoom-level" id="zoomLevel">100%</span>
-        <button class="tool-btn" id="zoomIn" title="Zoom In">&plus;</button>
+        <button class="tool-btn" id="zoomIn" data-i18n-title="zoom_in" title="Zoom In">&plus;</button>
       </span>
     </div>
     <div class="viz-container" id="vizContainer">
       <svg id="edgeSvg"></svg>
       <div id="nodeLayer"></div>
     </div>
-    <div class="viz-empty" id="vizEmpty">Enter JSON on the right to visualize</div>
+    <div class="viz-empty" id="vizEmpty" data-i18n="empty_state">Enter JSON on the right to visualize</div>
   </div>
 
   <div class="divider" id="divider"></div>
 
   <div class="input-panel">
     <div class="input-toolbar">
-      <span class="input-title">JSON Input</span>
-      <button class="tool-btn" id="formatBtn">Format</button>
-      <button class="tool-btn" id="sampleBtn">Sample</button>
+      <span class="input-title" data-i18n="json_input">JSON Input</span>
+      <button class="tool-btn" id="formatBtn" data-i18n="format">Format</button>
+      <button class="tool-btn" id="sampleBtn" data-i18n="sample">Sample</button>
     </div>
-    <textarea id="jsonInput" spellcheck="false" placeholder="Paste or type JSON here..."></textarea>
+    <textarea id="jsonInput" spellcheck="false" data-i18n-placeholder="placeholder" placeholder="Paste or type JSON here..."></textarea>
     <div class="error-bar" id="errorBar"></div>
   </div>
 </div>
 
+<script src="../i18n.js"></script>
 <script src="JSONVisualizer.js"></script>
+<script>I18N.load('JSONVisualizer_en.json');</script>
 
 </body>
 </html>

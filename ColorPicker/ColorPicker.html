@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RGB 색상 피커</title>
+<title>RGB Color Picker</title>
 <link rel="stylesheet" href="ColorPicker.css">
 </head>
 <body>
 
 <div class="panel left-panel">
   <div>
-    <h1>RGB 색상 피커</h1>
-    <p class="subtitle">슬라이더를 움직여 색상을 조절하세요</p>
+    <h1 data-i18n="title">RGB Color Picker</h1>
+    <p class="subtitle" data-i18n="subtitle">Adjust color using the sliders</p>
   </div>
 
   <div class="slider-group">
     <div class="slider-item">
       <div class="slider-header">
-        <span class="slider-label color-r">RED</span>
+        <span class="slider-label color-r" data-i18n="red">RED</span>
         <span class="slider-value color-r" id="valR">128</span>
       </div>
       <div class="slider-input-row">
@@ -27,7 +27,7 @@
     </div>
     <div class="slider-item">
       <div class="slider-header">
-        <span class="slider-label color-g">GREEN</span>
+        <span class="slider-label color-g" data-i18n="green">GREEN</span>
         <span class="slider-value color-g" id="valG">128</span>
       </div>
       <div class="slider-input-row">
@@ -37,7 +37,7 @@
     </div>
     <div class="slider-item">
       <div class="slider-header">
-        <span class="slider-label color-b">BLUE</span>
+        <span class="slider-label color-b" data-i18n="blue">BLUE</span>
         <span class="slider-value color-b" id="valB">128</span>
       </div>
       <div class="slider-input-row">
@@ -49,12 +49,12 @@
 
   <div class="preview-group">
     <div class="color-preview" id="preview"></div>
-    <div class="hex-display" id="hexDisplay" title="클릭하여 복사">#808080</div>
+    <div class="hex-display" id="hexDisplay" data-i18n-title="click_to_copy" title="Click to copy">#808080</div>
   </div>
 
   <div class="info-sections">
     <div class="info-section">
-      <h2>RGB</h2>
+      <h2 data-i18n="rgb">RGB</h2>
       <div class="info-grid">
         <span class="info-label">R</span><span class="info-val" id="rgbR">128</span><span class="info-hex" id="rgbRh">80</span>
         <span class="info-label">G</span><span class="info-val" id="rgbG">128</span><span class="info-hex" id="rgbGh">80</span>
@@ -62,7 +62,7 @@
       </div>
     </div>
     <div class="info-section">
-      <h2>CMY</h2>
+      <h2 data-i18n="cmy">CMY</h2>
       <div class="info-grid">
         <span class="info-label">C</span><span class="info-val" id="cmyC">127</span><span class="info-hex" id="cmyCh">7F</span>
         <span class="info-label">M</span><span class="info-val" id="cmyM">127</span><span class="info-hex" id="cmyMh">7F</span>
@@ -70,7 +70,7 @@
       </div>
     </div>
     <div class="info-section">
-      <h2>HSB</h2>
+      <h2 data-i18n="hsb">HSB</h2>
       <div class="info-grid">
         <span class="info-label">H</span><span class="info-val" id="hsbH">0°</span><span class="info-hex" id="hsbHh">-</span>
         <span class="info-label">S</span><span class="info-val" id="hsbS">0%</span><span class="info-hex" id="hsbSh">-</span>
@@ -80,42 +80,44 @@
   </div>
 
   <div class="preview-group complementary-group">
-    <h2>보색 (Complementary)</h2>
+    <h2 data-i18n="complementary">Complementary</h2>
     <div class="complementary-row">
       <div class="color-preview" id="compPreview"></div>
       <div class="complementary-info">
-        <div class="hex-display" id="compHex" title="클릭하여 복사">#7F7F7F</div>
+        <div class="hex-display" id="compHex" data-i18n-title="click_to_copy" title="Click to copy">#7F7F7F</div>
         <div class="comp-details">
           <span class="info-label">R</span><span class="info-val" id="compR">127</span>
           <span class="info-label">G</span><span class="info-val" id="compG">127</span>
           <span class="info-label">B</span><span class="info-val" id="compB">127</span>
         </div>
-        <div class="comp-name" id="compName">회색 / Gray</div>
+        <div class="comp-name" id="compName">Gray</div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="center" id="bgArea">
-  <div class="center-label" id="centerLabel">미리보기 영역</div>
+  <div class="center-label" id="centerLabel" data-i18n="preview_area">Preview area</div>
 </div>
 
 <div class="panel right-panel">
   <div class="color-name-box">
-    <h3>가장 가까운 색상 이름</h3>
-    <div class="name-exact" id="nameKo">회색</div>
-    <div class="name-sub" id="nameEn">Gray</div>
+    <h3 data-i18n="closest_name">Closest Color Name</h3>
+    <div class="name-exact" id="nameKo"></div>
+    <div class="name-sub" id="nameEn"></div>
     <div class="name-distance" id="nameDist"></div>
   </div>
   <div class="color-name-box">
-    <h3>유사한 색상 10개</h3>
+    <h3 data-i18n="similar_10">10 Similar Colors</h3>
     <div class="nearest-list" id="nearestList"></div>
   </div>
 </div>
 
-<div class="copy-toast" id="toast">클립보드에 복사되었습니다!</div>
+<div class="copy-toast" id="toast" data-i18n="copied">Copied to clipboard!</div>
 
+<script src="../i18n.js"></script>
 <script src="ColorPicker.js"></script>
+<script>I18N.load('ColorPicker_en.json');</script>
 
 </body>
 </html>

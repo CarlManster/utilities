@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +9,20 @@
 <body>
 
 <nav>
-  <div class="brand">Utilities</div>
+  <div class="brand" data-i18n="brand">Utilities</div>
   <div class="nav-links">
-    <a class="nav-link active" data-src="Dices/DiceCalculator.html" onclick="navigate(this)" title="Dice Calculator">&#x1F3B2;</a>
-    <a class="nav-link" data-src="ColorPicker/ColorPicker.html" onclick="navigate(this)" title="Color Picker">&#x1F3A8;</a>
-    <a class="nav-link" data-src="JSONVisualizer/JSONVisualizer.html" onclick="navigate(this)" title="JSON Visualizer"><span style="position:relative;top:-2px">{ }</span></a>
-    <a class="nav-link" data-src="DayInfo/DayInfo.html" onclick="navigate(this)" title="Day Info">&#x1F4C5;</a>
+    <a class="nav-link active" data-src="Dices/DiceCalculator.html" onclick="navigate(this)" data-i18n-title="nav_dice" title="Dice Calculator">&#x1F3B2;</a>
+    <a class="nav-link" data-src="ColorPicker/ColorPicker.html" onclick="navigate(this)" data-i18n-title="nav_color" title="Color Picker">&#x1F3A8;</a>
+    <a class="nav-link" data-src="JSONVisualizer/JSONVisualizer.html" onclick="navigate(this)" data-i18n-title="nav_json" title="JSON Visualizer"><span style="position:relative;top:-2px">{ }</span></a>
+    <a class="nav-link" data-src="DayInfo/DayInfo.html" onclick="navigate(this)" data-i18n-title="nav_dayinfo" title="Day Info">&#x1F4C5;</a>
   </div>
 </nav>
 
 <iframe id="content" src="Dices/DiceCalculator.html"></iframe>
 
+<script src="i18n.js"></script>
 <script src="script.js"></script>
+<script>I18N.load('index_en.json');</script>
 
 </body>
 </html>

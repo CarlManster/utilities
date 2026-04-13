@@ -1,0 +1,19 @@
+{
+  "title": "JSON Visualizer",
+  "visualization": "Visualization",
+  "expand_all": "Expand All",
+  "collapse_all": "Collapse All",
+  "reset_layout": "Reset Layout",
+  "fit_to_view": "Fit to View",
+  "zoom_out": "Zoom Out",
+  "zoom_in": "Zoom In",
+  "empty_state": "Enter JSON on the right to visualize",
+  "json_input": "JSON Input",
+  "format": "Format",
+  "sample": "Sample",
+  "placeholder": "Paste or type JSON here...",
+  "root": "Root",
+  "child_count": "child: ",
+  "null_value": "null",
+  "too_many_nodes": "Too many nodes ({count}). Limit is 500. Simplify the JSON to visualize."
+}
