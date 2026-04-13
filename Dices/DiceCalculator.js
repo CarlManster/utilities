@@ -57,11 +57,11 @@ function calculate() {
   const errorEl = document.getElementById('diceError');
   const numberOfDice = parseInt(document.getElementById('numDice').value, 10);
   if (isNaN(numberOfDice) || numberOfDice < 1) {
-    errorEl.textContent = 'Please enter the number of dice (1~20).';
+    errorEl.textContent = I18N.t('error_num_dice', 'Please enter the number of dice (1~20).');
     return;
   }
   if (numberOfDice > 20) {
-    errorEl.textContent = 'Maximum 20 dice allowed.';
+    errorEl.textContent = I18N.t('error_max_dice', 'Maximum 20 dice allowed.');
     return;
   }
   errorEl.textContent = '';
@@ -82,7 +82,7 @@ function calculate() {
   const operation = document.querySelector('input[name="operation"]:checked').value;
   const isProduct = operation === 'product';
   const headerEl = document.getElementById('resultHeader');
-  headerEl.innerHTML = (isProduct ? 'Product' : 'Sum') + ' <span class="sort-arrow"></span>';
+  headerEl.innerHTML = (isProduct ? I18N.t('op_product', 'Product') : I18N.t('op_sum', 'Sum')) + ' <span class="sort-arrow"></span>';
 
   const thisCalcId = ++calcId;
   showLoading(true);
@@ -117,11 +117,11 @@ function calculate() {
     if (aborted) {
       const ev = analyticalExpectedValue(faceSetOfDice, numberOfDice, isProduct);
       showExpectedValue(ev, numberOfDice, faceSetOfDice,
-        `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCombStr.toLocaleString()} total combinations`,
+        `${numberOfDice} ${I18N.t('dice_with','dice with')} ${faceSetOfDice.length} ${I18N.t('faces','faces')}<br>[${faceSetOfDice.join(', ')}]<br>${totalCombStr.toLocaleString()} ${I18N.t('total_combinations','total combinations')}`,
         isProduct);
       showTableError(
-        `Too many unique ${isProduct ? 'products' : 'sums'} to compute (over ${COMPUTE_LIMIT.toLocaleString()}).<br>` +
-        `Try fewer dice or fewer face values.`
+        `${I18N.t('too_many_compute','Too many unique products/sums to compute')} (${COMPUTE_LIMIT.toLocaleString()}).<br>` +
+        I18N.t('try_fewer','Try fewer dice or fewer face values.')
       );
       showLoading(false);
       return;
@@ -154,15 +154,15 @@ function calculate() {
     }
 
     const totalInfo =
-      `${numberOfDice} dice with ${faceSetOfDice.length} faces<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} total combinations<br>${rows.length} unique ${isProduct ? 'products' : 'sums'}`;
+      `${numberOfDice} ${I18N.t('dice_with','dice with')} ${faceSetOfDice.length} ${I18N.t('faces','faces')}<br>[${faceSetOfDice.join(', ')}]<br>${totalCount.toLocaleString()} ${I18N.t('total_combinations','total combinations')}<br>${rows.length} ${I18N.t('unique_values','unique products/sums')}`;
 
     // Show expected value
     showExpectedValue(expectedValue, numberOfDice, faceSetOfDice, totalInfo, isProduct);
 
     if (rows.length > TABLE_LIMIT) {
       showTableError(
-        `Too many unique ${isProduct ? 'products' : 'sums'} to display (${rows.length.toLocaleString()} rows, limit ${TABLE_LIMIT.toLocaleString()}).<br>` +
-        `The expected value is still shown above.`
+        `${I18N.t('too_many_display','Too many unique products/sums to display')} (${rows.length.toLocaleString()}, limit ${TABLE_LIMIT.toLocaleString()}).<br>` +
+        I18N.t('ev_shown_above','The expected value is still shown above.')
       );
       showLoading(false);
       return;
