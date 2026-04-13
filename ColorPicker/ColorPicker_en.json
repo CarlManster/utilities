@@ -12,7 +12,6 @@
   "closest_name": "Closest Color Name",
   "similar_10": "10 Similar Colors",
   "copied": "Copied to clipboard!",
-  "preview_area": "Preview area",
   "exact_match": "Exact match!",
   "distance_prefix": "Distance: ",
   "distance_suffix": " (closer = more similar)"

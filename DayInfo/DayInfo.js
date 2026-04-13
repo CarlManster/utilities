@@ -566,11 +566,6 @@ function init() {
   });
   document.getElementById('epochInput').addEventListener('input', validateEpochInput);
 
-  document.addEventListener('i18n-loaded', function () {
-    updateKeyButton();
-    render();
-  });
-
   updateKeyButton();
   render();
 }

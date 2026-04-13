@@ -1,15 +1,26 @@
 var I18N = (function () {
   var _data = {};
+  var _allLangs = {};
 
-  function load(path) {
-    return fetch(path)
-      .then(function (r) { return r.json(); })
-      .then(function (json) {
-        _data = json;
-        applyDOM();
-        document.dispatchEvent(new Event('i18n-loaded'));
-      })
-      .catch(function () {});
+  function register(langs) {
+    _allLangs = langs;
+  }
+
+  function setLang(lang) {
+    _data = _allLangs[lang] || _allLangs['en'] || {};
+    applyDOM();
+    document.dispatchEvent(new Event('i18n-loaded'));
+  }
+
+  function getLang() {
+    return new URLSearchParams(location.search).get('lang')
+      || (document.cookie.match(/(^|;\s*)utilities_lang=([^;]*)/) || [])[2]
+      || 'en';
+  }
+
+  function init(langs) {
+    register(langs);
+    setLang(getLang());
   }
 
   function applyDOM() {
@@ -34,7 +45,6 @@ var I18N = (function () {
   function t(key, fallbackOrParams, params) {
     var s = _data[key];
     if (s === undefined) {
-      // t('key', 'fallback') or t('key', 'fallback', {params})
       if (typeof fallbackOrParams === 'string') return fallbackOrParams;
       return fallbackOrParams !== undefined ? fallbackOrParams : key;
     }
@@ -47,5 +57,5 @@ var I18N = (function () {
     return s;
   }
 
-  return { load: load, t: t, apply: applyDOM };
+  return { init: init, setLang: setLang, getLang: getLang, t: t, apply: applyDOM };
 })();

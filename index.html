@@ -16,13 +16,43 @@
     <a class="nav-link" data-src="JSONVisualizer/JSONVisualizer.html" onclick="navigate(this)" data-i18n-title="nav_json" title="JSON Visualizer"><span style="position:relative;top:-2px">{ }</span></a>
     <a class="nav-link" data-src="DayInfo/DayInfo.html" onclick="navigate(this)" data-i18n-title="nav_dayinfo" title="Day Info">&#x1F4C5;</a>
   </div>
+  <select id="langSelect" class="lang-select" aria-label="Language">
+    <option value="en">EN</option>
+    <option value="ko">KO</option>
+    <option value="jp">JP</option>
+  </select>
 </nav>
 
-<iframe id="content" src="Dices/DiceCalculator.html"></iframe>
+<iframe id="content"></iframe>
 
 <script src="i18n.js"></script>
+<script src="index_lang.js"></script>
 <script src="script.js"></script>
-<script>I18N.load('index_en.json');</script>
+<script>
+(function() {
+  var sel = document.getElementById('langSelect');
+  var saved = I18N.getLang();
+  sel.value = saved;
+
+  function applyLang(lang) {
+    var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    document.cookie = 'utilities_lang=' + lang + ';expires=' + d.toUTCString() + ';path=/';
+    document.documentElement.lang = lang === 'jp' ? 'ja' : lang;
+    I18N.setLang(lang);
+    var iframe = document.getElementById('content');
+    var active = document.querySelector('.nav-link.active');
+    var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
+    iframe.src = base + '?lang=' + lang;
+  }
+
+  sel.addEventListener('change', function() { applyLang(this.value); });
+
+  // Initial iframe load
+  var active = document.querySelector('.nav-link.active');
+  var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
+  document.getElementById('content').src = base + '?lang=' + saved;
+})();
+</script>
 
 </body>
 </html>

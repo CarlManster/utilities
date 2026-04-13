@@ -1,0 +1,19 @@
+{
+  "title": "JSONビジュアライザー",
+  "visualization": "ビジュアライズ",
+  "expand_all": "すべて展開",
+  "collapse_all": "すべて折りたたむ",
+  "reset_layout": "レイアウトリセット",
+  "fit_to_view": "画面に合わせる",
+  "zoom_out": "縮小",
+  "zoom_in": "拡大",
+  "empty_state": "右側にJSONを入力すると視覚化されます",
+  "json_input": "JSON入力",
+  "format": "フォーマット",
+  "sample": "サンプル",
+  "placeholder": "ここにJSONを貼り付けるか入力してください...",
+  "root": "ルート",
+  "child_count": "子要素: ",
+  "null_value": "null",
+  "too_many_nodes": "ノードが多すぎます（{count}）。上限は500です。JSONを簡略化してください。"
+}

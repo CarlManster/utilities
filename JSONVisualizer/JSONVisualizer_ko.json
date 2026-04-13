@@ -1,0 +1,19 @@
+{
+  "title": "JSON 시각화",
+  "visualization": "시각화",
+  "expand_all": "모두 펼치기",
+  "collapse_all": "모두 접기",
+  "reset_layout": "레이아웃 초기화",
+  "fit_to_view": "화면에 맞추기",
+  "zoom_out": "축소",
+  "zoom_in": "확대",
+  "empty_state": "오른쪽에 JSON을 입력하면 시각화됩니다",
+  "json_input": "JSON 입력",
+  "format": "포맷",
+  "sample": "샘플",
+  "placeholder": "여기에 JSON을 붙여넣거나 입력하세요...",
+  "root": "루트",
+  "child_count": "하위: ",
+  "null_value": "null",
+  "too_many_nodes": "노드가 너무 많습니다 ({count}). 최대 500개입니다. JSON을 간소화해주세요."
+}

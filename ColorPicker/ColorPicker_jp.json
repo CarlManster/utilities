@@ -1,0 +1,18 @@
+{
+  "title": "RGBカラーピッカー",
+  "subtitle": "スライダーで色を調整してください",
+  "red": "赤",
+  "green": "緑",
+  "blue": "青",
+  "rgb": "RGB",
+  "cmy": "CMY",
+  "hsb": "HSB",
+  "click_to_copy": "クリックでコピー",
+  "complementary": "補色",
+  "closest_name": "最も近い色名",
+  "similar_10": "類似色10色",
+  "copied": "クリップボードにコピーしました！",
+  "exact_match": "完全一致！",
+  "distance_prefix": "距離: ",
+  "distance_suffix": "（近いほど類似）"
+}
