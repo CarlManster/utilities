@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan Repayment Calculator</title>
+<link rel="stylesheet" href="Repayment.css">
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1 data-i18n="title">Loan Repayment Calculator</h1>
+    <p class="subtitle" data-i18n="subtitle">Equal principal / Equal principal+interest repayment</p>
+  </header>
+
+  <div class="input-panel">
+    <div class="input-group">
+      <label data-i18n="method">Repayment Method</label>
+      <div class="radio-row">
+        <label class="radio-label">
+          <input type="radio" name="method" value="principal" checked>
+          <span data-i18n="method_principal">Equal Principal</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="method" value="annuity">
+          <span data-i18n="method_annuity">Equal Principal + Interest</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="loanAmount" data-i18n="loan_amount">Loan Principal</label>
+      <div class="input-with-unit">
+        <input type="text" id="loanAmount" inputmode="numeric" value="100,000,000" aria-label="Loan amount">
+        <span class="unit" data-i18n="currency">KRW</span>
+      </div>
+      <div class="quick-btns">
+        <button type="button" onclick="addAmount(1000000)" data-i18n="add_1m">+1M</button>
+        <button type="button" onclick="addAmount(5000000)" data-i18n="add_5m">+5M</button>
+        <button type="button" onclick="addAmount(10000000)" data-i18n="add_10m">+10M</button>
+        <button type="button" onclick="addAmount(50000000)" data-i18n="add_50m">+50M</button>
+        <button type="button" onclick="resetAmount()" data-i18n="reset">Reset</button>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-group half">
+        <label for="loanTerm" data-i18n="loan_term">Loan Term (months)</label>
+        <input type="number" id="loanTerm" value="120" min="1" max="480" aria-label="Loan term">
+        <div class="quick-btns">
+          <button type="button" onclick="addTerm(6)" data-i18n="add_6mo">+6mo</button>
+          <button type="button" onclick="addTerm(12)" data-i18n="add_1yr">+1yr</button>
+          <button type="button" onclick="addTerm(36)" data-i18n="add_3yr">+3yr</button>
+          <button type="button" onclick="addTerm(60)" data-i18n="add_5yr">+5yr</button>
+          <button type="button" onclick="resetTerm()" data-i18n="reset">Reset</button>
+        </div>
+      </div>
+      <div class="input-group half">
+        <label for="gracePeriod" data-i18n="grace_period">Grace Period (months)</label>
+        <input type="number" id="gracePeriod" value="0" min="0" max="480" aria-label="Grace period">
+        <div class="quick-btns">
+          <button type="button" onclick="addGrace(12)" data-i18n="add_1yr">+1yr</button>
+          <button type="button" onclick="addGrace(24)" data-i18n="add_2yr">+2yr</button>
+          <button type="button" onclick="addGrace(36)" data-i18n="add_3yr">+3yr</button>
+          <button type="button" onclick="resetGrace()" data-i18n="reset">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="interestRate" data-i18n="interest_rate">Annual Interest Rate (%)</label>
+      <div class="rate-row">
+        <input type="range" id="rateSlider" min="0" max="3000" value="300" step="1">
+        <input type="number" id="interestRate" value="3.00" min="0" max="30" step="0.01" aria-label="Interest rate">
+        <span class="unit">%</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="results" id="results" hidden>
+    <div class="summary-cards">
+      <div class="card">
+        <div class="card-label" id="monthlyLabel" data-i18n="monthly_principal">Monthly Principal</div>
+        <div class="card-value" id="monthlyValue">-</div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="total_interest">Total Interest</div>
+        <div class="card-value" id="totalInterest">-</div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="total_payment">Total Payment</div>
+        <div class="card-value" id="totalPayment">-</div>
+      </div>
+    </div>
+
+    <h2 data-i18n="schedule">Amortization Schedule</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="col_period">#</th>
+            <th data-i18n="col_payment">Payment</th>
+            <th data-i18n="col_principal">Principal</th>
+            <th data-i18n="col_interest">Interest</th>
+            <th data-i18n="col_cumulative">Cumulative Principal</th>
+            <th data-i18n="col_balance">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@5/dist/fp.min.js"></script>
+<script src="../i18n.js"></script>
+<script src="Repayment_lang.js"></script>
+<script src="../settings.js"></script>
+<script src="Repayment.js"></script>
+</body>
+</html>

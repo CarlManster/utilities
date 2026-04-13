@@ -3,7 +3,8 @@ var Settings = (function () {
   var SALT = 'utilities_setting_salt';
   var _data = {
     lang: 'en', defaultpage: null, lastpage: '',
-    dayInfo: {}, dice: {}, colorpicker: {}, jsonvisualizer: {}
+    dayInfo: {}, dice: {}, colorpicker: {}, jsonvisualizer: {},
+    repayment: { principal: 100000000, period: 120, holding: 0, interest: 3.0 }
   };
   var _key = null;
   var _useCrypto = !!(window.crypto && window.crypto.subtle);

@@ -13,7 +13,8 @@ var pages = [
   { dir: 'Dices', name: 'DiceCalculator' },
   { dir: 'ColorPicker', name: 'ColorPicker' },
   { dir: 'JSONVisualizer', name: 'JSONVisualizer' },
-  { dir: 'DayInfo', name: 'DayInfo' }
+  { dir: 'DayInfo', name: 'DayInfo' },
+  { dir: 'Repayment', name: 'Repayment' }
 ];
 
 var langs = ['en', 'ko', 'jp'];
