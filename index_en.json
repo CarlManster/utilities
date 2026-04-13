@@ -3,5 +3,16 @@
   "nav_dice": "Dice Calculator",
   "nav_color": "Color Picker",
   "nav_json": "JSON Visualizer",
-  "nav_dayinfo": "Day Info"
+  "nav_dayinfo": "Day Info",
+  "settings": "Settings",
+  "settings_lang": "Language",
+  "lang_en": "English",
+  "lang_ko": "Korean",
+  "lang_jp": "Japanese",
+  "settings_defaultpage": "Default Page",
+  "page_last": "Last visited page",
+  "page_dice": "Dice Calculator",
+  "page_color": "Color Picker",
+  "page_json": "JSON Visualizer",
+  "page_dayinfo": "Day Info"
 }

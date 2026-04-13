@@ -3,5 +3,16 @@
   "nav_dice": "주사위 계산기",
   "nav_color": "색상 피커",
   "nav_json": "JSON 시각화",
-  "nav_dayinfo": "날짜 정보"
+  "nav_dayinfo": "날짜 정보",
+  "settings": "설정",
+  "settings_lang": "언어",
+  "lang_en": "영어",
+  "lang_ko": "한국어",
+  "lang_jp": "일본어",
+  "settings_defaultpage": "기본 페이지",
+  "page_last": "마지막 페이지",
+  "page_dice": "주사위 계산기",
+  "page_color": "색상 피커",
+  "page_json": "JSON 시각화",
+  "page_dayinfo": "날짜 정보"
 }

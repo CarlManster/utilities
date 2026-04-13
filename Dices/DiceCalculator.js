@@ -228,5 +228,5 @@ function sortTable(col) {
   renderTable();
 }
 
-// Auto-calculate on load
-calculate();
+// Auto-calculate after settings/i18n ready
+Settings.ready.then(function() { calculate(); });

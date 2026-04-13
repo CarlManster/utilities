@@ -4,20 +4,53 @@ I18N.register({
     "nav_dice": "Dice Calculator",
     "nav_color": "Color Picker",
     "nav_json": "JSON Visualizer",
-    "nav_dayinfo": "Day Info"
+    "nav_dayinfo": "Day Info",
+    "settings": "Settings",
+    "settings_lang": "Language",
+    "lang_en": "English",
+    "lang_ko": "Korean",
+    "lang_jp": "Japanese",
+    "settings_defaultpage": "Default Page",
+    "page_last": "Last visited page",
+    "page_dice": "Dice Calculator",
+    "page_color": "Color Picker",
+    "page_json": "JSON Visualizer",
+    "page_dayinfo": "Day Info"
   },
   "ko": {
     "brand": "Utilities",
     "nav_dice": "주사위 계산기",
     "nav_color": "색상 피커",
     "nav_json": "JSON 시각화",
-    "nav_dayinfo": "날짜 정보"
+    "nav_dayinfo": "날짜 정보",
+    "settings": "설정",
+    "settings_lang": "언어",
+    "lang_en": "영어",
+    "lang_ko": "한국어",
+    "lang_jp": "일본어",
+    "settings_defaultpage": "기본 페이지",
+    "page_last": "마지막 페이지",
+    "page_dice": "주사위 계산기",
+    "page_color": "색상 피커",
+    "page_json": "JSON 시각화",
+    "page_dayinfo": "날짜 정보"
   },
   "jp": {
     "brand": "Utilities",
     "nav_dice": "サイコロ計算機",
     "nav_color": "カラーピッカー",
     "nav_json": "JSONビジュアライザー",
-    "nav_dayinfo": "日付情報"
+    "nav_dayinfo": "日付情報",
+    "settings": "設定",
+    "settings_lang": "言語",
+    "lang_en": "英語",
+    "lang_ko": "韓国語",
+    "lang_jp": "日本語",
+    "settings_defaultpage": "デフォルトページ",
+    "page_last": "最後のページ",
+    "page_dice": "サイコロ計算機",
+    "page_color": "カラーピッカー",
+    "page_json": "JSONビジュアライザー",
+    "page_dayinfo": "日付情報"
   }
 });

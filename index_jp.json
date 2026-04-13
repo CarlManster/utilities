@@ -3,5 +3,16 @@
   "nav_dice": "サイコロ計算機",
   "nav_color": "カラーピッカー",
   "nav_json": "JSONビジュアライザー",
-  "nav_dayinfo": "日付情報"
+  "nav_dayinfo": "日付情報",
+  "settings": "設定",
+  "settings_lang": "言語",
+  "lang_en": "英語",
+  "lang_ko": "韓国語",
+  "lang_jp": "日本語",
+  "settings_defaultpage": "デフォルトページ",
+  "page_last": "最後のページ",
+  "page_dice": "サイコロ計算機",
+  "page_color": "カラーピッカー",
+  "page_json": "JSONビジュアライザー",
+  "page_dayinfo": "日付情報"
 }

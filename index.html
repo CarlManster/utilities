@@ -16,12 +16,32 @@
     <a class="nav-link" data-src="JSONVisualizer/JSONVisualizer.html" onclick="navigate(this)" data-i18n-title="nav_json" title="JSON Visualizer"><span style="position:relative;top:-2px">{ }</span></a>
     <a class="nav-link" data-src="DayInfo/DayInfo.html" onclick="navigate(this)" data-i18n-title="nav_dayinfo" title="Day Info">&#x1F4C5;</a>
   </div>
-  <select id="langSelect" class="lang-select" aria-label="Language">
-    <option value="en">EN</option>
-    <option value="ko">KO</option>
-    <option value="jp">JP</option>
-  </select>
+  <button class="settings-btn" id="settingsBtn" aria-label="Settings">&#x2699;</button>
 </nav>
+
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-title" data-i18n="settings">Settings</div>
+    <div class="settings-group">
+      <div class="settings-label" data-i18n="settings_lang">Language</div>
+      <select class="settings-select" id="langSelect">
+        <option value="en" data-i18n="lang_en">English</option>
+        <option value="ko" data-i18n="lang_ko">Korean</option>
+        <option value="jp" data-i18n="lang_jp">Japanese</option>
+      </select>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label" data-i18n="settings_defaultpage">Default Page</div>
+      <select class="settings-select" id="defaultPageSelect">
+        <option value="" data-i18n="page_last">Last visited page</option>
+        <option value="Dices/DiceCalculator.html" data-i18n="page_dice">Dice Calculator</option>
+        <option value="ColorPicker/ColorPicker.html" data-i18n="page_color">Color Picker</option>
+        <option value="JSONVisualizer/JSONVisualizer.html" data-i18n="page_json">JSON Visualizer</option>
+        <option value="DayInfo/DayInfo.html" data-i18n="page_dayinfo">Day Info</option>
+      </select>
+    </div>
+  </div>
+</div>
 
 <iframe id="content"></iframe>
 
@@ -32,22 +52,24 @@
 <script src="script.js"></script>
 <script>
 Settings.ready.then(function() {
-  var sel = document.getElementById('langSelect');
   var lang = Settings.get('lang') || 'en';
-  sel.value = lang;
   document.documentElement.lang = lang === 'jp' ? 'ja' : lang;
 
-  // Load initial page: defaultpage > lastpage > DiceCalculator
-  var page = Settings.get('defaultpage') || Settings.get('lastpage') || 'Dices/DiceCalculator.html';
-  var match = document.querySelector('.nav-link[data-src="' + page + '"]');
-  if (!match) { page = 'Dices/DiceCalculator.html'; match = document.querySelector('.nav-link[data-src="' + page + '"]'); }
-  if (match) {
-    document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.remove('active'); });
-    match.classList.add('active');
-  }
-  document.getElementById('content').src = page + '?lang=' + lang;
+  /* ── Settings panel toggle ── */
+  var overlay = document.getElementById('settingsOverlay');
+  document.getElementById('settingsBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
 
-  sel.addEventListener('change', function() {
+  /* ── Language ── */
+  var langSel = document.getElementById('langSelect');
+  langSel.value = lang;
+
+  langSel.addEventListener('change', function() {
     var newLang = this.value;
     Settings.set('lang', newLang).then(function() {
       document.documentElement.lang = newLang === 'jp' ? 'ja' : newLang;
@@ -58,6 +80,31 @@ Settings.ready.then(function() {
       iframe.src = base + '?lang=' + newLang;
     });
   });
+
+  /* ── Default page ── */
+  var dpSel = document.getElementById('defaultPageSelect');
+  var savedDefault = Settings.get('defaultpage') || '';
+  dpSel.value = savedDefault;
+
+  dpSel.addEventListener('change', function() {
+    Settings.set('defaultpage', this.value);
+  });
+
+  /* ── Initial page load ── */
+  var defaultpage = Settings.get('defaultpage');
+  var page;
+  if (defaultpage) {
+    page = defaultpage; // specific page set
+  } else {
+    page = Settings.get('lastpage') || 'Dices/DiceCalculator.html'; // last visited
+  }
+  var match = document.querySelector('.nav-link[data-src="' + page + '"]');
+  if (!match) { page = 'Dices/DiceCalculator.html'; match = document.querySelector('.nav-link[data-src="' + page + '"]'); }
+  if (match) {
+    document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.remove('active'); });
+    match.classList.add('active');
+  }
+  document.getElementById('content').src = page + '?lang=' + lang;
 });
 </script>
 
