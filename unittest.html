@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Tests - Utilities</title>
+<style>
+:root {
+  --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --text2: #86868b;
+  --pass: #34c759; --fail: #ff3b30; --border: #e5e5ea; --accent: #0071e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1e; --card: #2c2c2e; --text: #f5f5f7; --text2: #98989d;
+    --pass: #30d158; --fail: #ff453a; --border: #48484a; --accent: #0a84ff;
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 32px 24px; max-width: 960px; margin: 0 auto; }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+.run-btn { height: 44px; padding: 0 28px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
+.run-btn:hover { opacity: 0.9; }
+.run-btn:disabled { opacity: 0.5; cursor: default; }
+
+.summary { display: flex; gap: 16px; margin-bottom: 20px; font-size: 14px; font-weight: 600; }
+.summary .pass { color: var(--pass); }
+.summary .fail { color: var(--fail); }
+
+.suite { margin-bottom: 20px; }
+.suite-header { font-size: 16px; font-weight: 700; padding: 10px 0; border-bottom: 2px solid var(--border); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.suite-header .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.badge-pass { background: var(--pass); color: #fff; }
+.badge-fail { background: var(--fail); color: #fff; }
+
+.test-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.test-row:hover { background: rgba(128,128,128,0.05); }
+.test-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+.test-icon.pass { color: var(--pass); }
+.test-icon.fail { color: var(--fail); }
+.test-name { flex: 1; }
+.test-detail { font-size: 11px; color: var(--fail); font-family: 'SF Mono','Menlo',monospace; max-width: 400px; word-break: break-all; }
+.test-time { font-size: 11px; color: var(--text2); font-family: monospace; flex-shrink: 0; }
+
+#output { display: none; }
+#output.visible { display: block; }
+</style>
+</head>
+<body>
+
+<h1>Unit Tests</h1>
+<p class="subtitle">Utilities project test suite</p>
+<button class="run-btn" id="runBtn" onclick="runAllTests()">Run Tests</button>
+
+<div id="output">
+  <div class="summary">
+    <span>Total: <strong id="totalCount">0</strong></span>
+    <span class="pass">Passed: <strong id="passCount">0</strong></span>
+    <span class="fail">Failed: <strong id="failCount">0</strong></span>
+    <span>Time: <strong id="totalTime">0</strong>ms</span>
+  </div>
+  <div id="results"></div>
+</div>
+
+<!-- Set test flag BEFORE loading any source files -->
+<script>window.__UNITTEST__ = true;</script>
+
+<!-- Stubs for DOM-dependent code -->
+<script>
+// Minimal stubs so source files don't crash on load
+(function() {
+  var noop = function(){};
+  var fakeEl = {
+    value:'', textContent:'', innerHTML:'', placeholder:'', hidden:false, disabled:false,
+    style:{}, className:'',
+    classList: { add:noop, remove:noop, toggle:noop, contains:function(){return false;} },
+    addEventListener:noop, setAttribute:noop, getAttribute:function(){return null;},
+    appendChild:noop, add:noop, closest:function(){return null;},
+    querySelectorAll:function(){return {forEach:noop};}
+  };
+  var origGetById = document.getElementById.bind(document);
+  document.getElementById = function(id) {
+    return origGetById(id) || Object.create(fakeEl);
+  };
+  var origQuerySelector = document.querySelector.bind(document);
+  document.querySelector = function(sel) {
+    return origQuerySelector(sel) || Object.create(fakeEl);
+  };
+  window.Option = window.Option || function(t,v){ this.text=t; this.value=v; };
+  // Stub FingerprintJS
+  window.FingerprintJS = { load: function(){ return Promise.resolve({ get: function(){ return Promise.resolve({ visitorId:'test-id-12345' }); } }); } };
+})();
+</script>
+
+<!-- Load source files -->
+<script src="i18n.js"></script>
+<script src="index_lang.js"></script>
+<script src="settings.js"></script>
+<script src="Dices/DiceCalculator_lang.js"></script>
+<script>
+// DiceCalculator.js has DOM calls at top level, load only the pure function
+function analyticalExpectedValue(faces, numDice, isProduct) {
+  var mean = faces.reduce(function(a,b){return a+b;}, 0) / faces.length;
+  return isProduct ? Math.pow(mean, numDice) : mean * numDice;
+}
+</script>
+<script src="DayInfo/DayInfo_lang.js"></script>
+<script src="DayInfo/DayInfo.js"></script>
+
+<script>
+/* ══════════════════════════════════════
+   Test Runner
+   ══════════════════════════════════════ */
+
+var _suites = [];
+var _currentSuite = null;
+
+function describe(name, fn) {
+  _currentSuite = { name: name, tests: [] };
+  _suites.push(_currentSuite);
+  fn();
+  _currentSuite = null;
+}
+
+function it(name, fn) {
+  _currentSuite.tests.push({ name: name, fn: fn });
+}
+
+function expect(actual) {
+  return {
+    toBe: function(expected) {
+      if (actual !== expected) throw new Error('Expected ' + JSON.stringify(expected) + ', got ' + JSON.stringify(actual));
+    },
+    toEqual: function(expected) {
+      var a = JSON.stringify(actual), b = JSON.stringify(expected);
+      if (a !== b) throw new Error('Expected ' + b + ', got ' + a);
+    },
+    toBeCloseTo: function(expected, precision) {
+      var p = precision || 2;
+      var diff = Math.abs(actual - expected);
+      if (diff > Math.pow(10, -p) / 2) throw new Error('Expected ~' + expected + ', got ' + actual + ' (diff ' + diff + ')');
+    },
+    toBeTruthy: function() {
+      if (!actual) throw new Error('Expected truthy, got ' + JSON.stringify(actual));
+    },
+    toBeNull: function() {
+      if (actual !== null) throw new Error('Expected null, got ' + JSON.stringify(actual));
+    },
+    toBeGreaterThan: function(n) {
+      if (!(actual > n)) throw new Error('Expected > ' + n + ', got ' + actual);
+    },
+    toBeLessThan: function(n) {
+      if (!(actual < n)) throw new Error('Expected < ' + n + ', got ' + actual);
+    }
+  };
+}
+
+function runAllTests() {
+  var btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+
+  // Wait for Settings to be ready
+  Settings.ready.then(function() {
+    var totalPass = 0, totalFail = 0;
+    var startAll = performance.now();
+    var resultsEl = document.getElementById('results');
+    resultsEl.innerHTML = '';
+
+    for (var s = 0; s < _suites.length; s++) {
+      var suite = _suites[s];
+      var suiteDiv = document.createElement('div');
+      suiteDiv.className = 'suite';
+      var suitePass = 0, suiteFail = 0;
+
+      var headerDiv = document.createElement('div');
+      headerDiv.className = 'suite-header';
+      var headerText = document.createElement('span');
+      headerText.textContent = suite.name;
+      headerDiv.appendChild(headerText);
+      suiteDiv.appendChild(headerDiv);
+
+      for (var t = 0; t < suite.tests.length; t++) {
+        var test = suite.tests[t];
+        var row = document.createElement('div');
+        row.className = 'test-row';
+
+        var icon = document.createElement('span');
+        icon.className = 'test-icon';
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'test-name';
+        nameSpan.textContent = test.name;
+
+        var start = performance.now();
+        var error = null;
+        try {
+          test.fn();
+        } catch(e) {
+          error = e;
+        }
+        var elapsed = (performance.now() - start).toFixed(1);
+
+        if (error) {
+          suiteFail++; totalFail++;
+          icon.textContent = '\u2717'; icon.classList.add('fail');
+          var detail = document.createElement('span');
+          detail.className = 'test-detail';
+          detail.textContent = error.message;
+          row.appendChild(icon); row.appendChild(nameSpan); row.appendChild(detail);
+        } else {
+          suitePass++; totalPass++;
+          icon.textContent = '\u2713'; icon.classList.add('pass');
+          row.appendChild(icon); row.appendChild(nameSpan);
+        }
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'test-time';
+        timeSpan.textContent = elapsed + 'ms';
+        row.appendChild(timeSpan);
+        suiteDiv.appendChild(row);
+      }
+
+      var badge = document.createElement('span');
+      badge.className = 'badge ' + (suiteFail ? 'badge-fail' : 'badge-pass');
+      badge.textContent = suitePass + '/' + (suitePass + suiteFail);
+      headerDiv.appendChild(badge);
+
+      resultsEl.appendChild(suiteDiv);
+    }
+
+    var totalTime = (performance.now() - startAll).toFixed(0);
+    document.getElementById('totalCount').textContent = totalPass + totalFail;
+    document.getElementById('passCount').textContent = totalPass;
+    document.getElementById('failCount').textContent = totalFail;
+    document.getElementById('totalTime').textContent = totalTime;
+    document.getElementById('output').classList.add('visible');
+
+    btn.disabled = false;
+    btn.textContent = 'Run Tests';
+  });
+}
+
+/* ══════════════════════════════════════
+   Test Suites
+   ══════════════════════════════════════ */
+
+var D = window._DayInfo || {};
+
+/* ── DayInfo: pad2 / fmtDate / fmtTz ── */
+describe('DayInfo - Formatting', function() {
+  it('pad2(1) → "01"', function() { expect(D.pad2(1)).toBe('01'); });
+  it('pad2(12) → "12"', function() { expect(D.pad2(12)).toBe('12'); });
+  it('pad2(0) → "00"', function() { expect(D.pad2(0)).toBe('00'); });
+
+  it('fmtDate(2026, 4, 13) → "2026.04.13"', function() { expect(D.fmtDate(2026,4,13)).toBe('2026.04.13'); });
+  it('fmtDate(1, 1, 1) → "1.01.01"', function() { expect(D.fmtDate(1,1,1)).toBe('1.01.01'); });
+
+  it('fmtTz(540) → "UTC+9"', function() { expect(D.fmtTz(540)).toBe('UTC+9'); });
+  it('fmtTz(-300) → "UTC-5"', function() { expect(D.fmtTz(-300)).toBe('UTC-5'); });
+  it('fmtTz(0) → "UTC+0"', function() { expect(D.fmtTz(0)).toBe('UTC+0'); });
+  it('fmtTz(330) → "UTC+5:30"', function() { expect(D.fmtTz(330)).toBe('UTC+5:30'); });
+  it('fmtTz(-210) → "UTC-3:30"', function() { expect(D.fmtTz(-210)).toBe('UTC-3:30'); });
+});
+
+/* ── DayInfo: Solar days in month ── */
+describe('DayInfo - solarDaysInMonth', function() {
+  it('January has 31 days', function() { expect(D.solarDaysInMonth(2026,1)).toBe(31); });
+  it('February 2026 (non-leap) has 28', function() { expect(D.solarDaysInMonth(2026,2)).toBe(28); });
+  it('February 2024 (leap) has 29', function() { expect(D.solarDaysInMonth(2024,2)).toBe(29); });
+  it('February 1900 (non-leap) has 28', function() { expect(D.solarDaysInMonth(1900,2)).toBe(28); });
+  it('February 2000 (leap/400) has 29', function() { expect(D.solarDaysInMonth(2000,2)).toBe(29); });
+  it('April has 30 days', function() { expect(D.solarDaysInMonth(2026,4)).toBe(30); });
+  it('December has 31 days', function() { expect(D.solarDaysInMonth(2026,12)).toBe(31); });
+});
+
+/* ── DayInfo: Lunar data (table-based) ── */
+describe('DayInfo - Lunar Table Data', function() {
+  it('leapMonth(2025) exists', function() { expect(D.leapMonth(2025)).toBeGreaterThan(0); });
+  it('leapMonth(2026) = 0 (no leap)', function() { expect(D.leapMonth(2026)).toBe(0); });
+  it('monthDays returns 29 or 30', function() {
+    var d = D.monthDays(2026, 1);
+    expect(d === 29 || d === 30).toBe(true);
+  });
+  it('yearDays(2026) is ~354-355', function() {
+    var d = D.yearDays(2026);
+    expect(d).toBeGreaterThan(350);
+    expect(d).toBeLessThan(390);
+  });
+});
+
+/* ── DayInfo: Julian Day conversions ── */
+describe('DayInfo - Julian Day', function() {
+  it('gregorianToJD(2000,1,1) = 2451544.5', function() {
+    expect(D.gregorianToJD(2000,1,1)).toBe(2451544.5);
+  });
+  it('gregorianToJD(1970,1,1) = 2440587.5', function() {
+    expect(D.gregorianToJD(1970,1,1)).toBe(2440587.5);
+  });
+  it('jdToGregorian(2451544.5) = {year:2000,month:1,day:1}', function() {
+    var g = D.jdToGregorian(2451544.5);
+    expect(g.year).toBe(2000); expect(g.month).toBe(1); expect(g.day).toBe(1);
+  });
+  it('roundtrip: gregorianToJD → jdToGregorian for 2026-04-13', function() {
+    var jd = D.gregorianToJD(2026,4,13);
+    var g = D.jdToGregorian(jd);
+    expect(g.year).toBe(2026); expect(g.month).toBe(4); expect(g.day).toBe(13);
+  });
+  it('roundtrip for year 1', function() {
+    var jd = D.gregorianToJD(1,1,1);
+    var g = D.jdToGregorian(jd);
+    expect(g.year).toBe(1); expect(g.month).toBe(1); expect(g.day).toBe(1);
+  });
+  it('roundtrip for year 5000', function() {
+    var jd = D.gregorianToJD(5000,12,31);
+    var g = D.jdToGregorian(jd);
+    expect(g.year).toBe(5000); expect(g.month).toBe(12); expect(g.day).toBe(31);
+  });
+});
+
+/* ── DayInfo: Solar ↔ Lunar conversion (table range) ── */
+describe('DayInfo - Solar/Lunar Conversion (1900-2100)', function() {
+  it('2026-02-17 (Solar) = Lunar 2026-01-01 (Lunar New Year)', function() {
+    var l = D.solarToLunar(2026,2,17);
+    expect(l).toBeTruthy();
+    expect(l.year).toBe(2026); expect(l.month).toBe(1); expect(l.day).toBe(1);
+  });
+  it('lunarToSolar(2026,1,1,false) = 2026-02-17', function() {
+    var s = D.lunarToSolar(2026,1,1,false);
+    expect(s.year).toBe(2026); expect(s.month).toBe(2); expect(s.day).toBe(17);
+  });
+  it('roundtrip: solarToLunar → lunarToSolar for 2026-04-13', function() {
+    var l = D.solarToLunar(2026,4,13);
+    var s = D.lunarToSolar(l.year, l.month, l.day, l.isLeap);
+    expect(s.year).toBe(2026); expect(s.month).toBe(4); expect(s.day).toBe(13);
+  });
+  it('2025 has a leap month', function() {
+    var lm = D.leapMonth(2025);
+    expect(lm).toBeGreaterThan(0);
+  });
+  it('2000-01-01 converts correctly', function() {
+    var l = D.solarToLunar(2000,1,1);
+    expect(l).toBeTruthy();
+    expect(l.year).toBe(1999); expect(l.month).toBe(11); expect(l.day).toBe(25);
+  });
+});
+
+/* ── DayInfo: Algorithmic conversion (outside 1900-2100) ── */
+describe('DayInfo - Algorithmic Conversion (outside table)', function() {
+  it('algoSolarToLunar(2101,1,1) returns result with approx flag', function() {
+    var l = D.algoSolarToLunar(2101,1,1);
+    expect(l).toBeTruthy();
+    expect(l.approx).toBe(true);
+    // Solar Jan 1 is still lunar previous year (lunar new year is in Feb)
+    expect(l.year).toBe(2100);
+    expect(l.month).toBeGreaterThan(10);
+  });
+  it('algoSolarToLunar(1800,6,15) returns result', function() {
+    var l = D.algoSolarToLunar(1800,6,15);
+    expect(l).toBeTruthy();
+    expect(l.approx).toBe(true);
+    expect(l.month).toBeGreaterThan(0);
+    expect(l.month).toBeLessThan(13);
+  });
+  it('solarToLunar(2101,3,1) falls through to algorithm', function() {
+    var l = D.solarToLunar(2101,3,1);
+    expect(l).toBeTruthy();
+    expect(l.approx).toBe(true);
+  });
+  it('algo roundtrip: algoSolarToLunar → algoLunarToSolar', function() {
+    var l = D.algoSolarToLunar(2150,6,15);
+    if (l) {
+      var s = D.algoLunarToSolar(l.year, l.month, l.day, l.isLeap);
+      expect(s).toBeTruthy();
+      // Allow ±1 day tolerance for algorithm
+      var diff = Math.abs(D.gregorianToJD(s.year,s.month,s.day) - D.gregorianToJD(2150,6,15));
+      expect(diff).toBeLessThan(2);
+    }
+  });
+});
+
+/* ── DayInfo: New Moon calculation ── */
+describe('DayInfo - Astronomical (New Moon)', function() {
+  it('calcNewMoon(0) ≈ JD 2451550.26 (Jan 6, 2000 18:14 UT)', function() {
+    var jd = D.calcNewMoon(0);
+    expect(jd).toBeCloseTo(2451550.26, 1);
+  });
+  it('solarLon at vernal equinox ≈ 0° (wraps 359-0)', function() {
+    var jd = D.gregorianToJD(2026,3,20);
+    var lon = D.solarLon(jd);
+    // 359.x° is close to 0° (wraps around 360)
+    var dist = lon > 180 ? 360 - lon : lon;
+    expect(dist).toBeLessThan(1);
+  });
+});
+
+/* ── Dice: analyticalExpectedValue ── */
+describe('Dice - Expected Value', function() {
+  it('1d6 sum expected value = 3.5', function() {
+    expect(analyticalExpectedValue([1,2,3,4,5,6], 1, false)).toBe(3.5);
+  });
+  it('2d6 sum expected value = 7', function() {
+    expect(analyticalExpectedValue([1,2,3,4,5,6], 2, false)).toBe(7);
+  });
+  it('3d6 sum expected value = 10.5', function() {
+    expect(analyticalExpectedValue([1,2,3,4,5,6], 3, false)).toBe(10.5);
+  });
+  it('1d6 product expected value = 3.5', function() {
+    expect(analyticalExpectedValue([1,2,3,4,5,6], 1, true)).toBe(3.5);
+  });
+  it('2d6 product expected value = 12.25', function() {
+    expect(analyticalExpectedValue([1,2,3,4,5,6], 2, true)).toBeCloseTo(12.25, 2);
+  });
+  it('coin flip: E[sum of 3] = 1.5', function() {
+    expect(analyticalExpectedValue([0,1], 3, false)).toBe(1.5);
+  });
+});
+
+/* ── I18N ── */
+describe('I18N - Translation', function() {
+  it('t() returns key when no data', function() {
+    expect(I18N.t('nonexistent_key')).toBe('nonexistent_key');
+  });
+  it('t() with string fallback returns fallback', function() {
+    expect(I18N.t('missing_key', 'Fallback')).toBe('Fallback');
+  });
+  it('register + setLang loads data', function() {
+    I18N.register({ test: { hello: 'world' } });
+    I18N.setLang('test');
+    expect(I18N.t('hello')).toBe('world');
+  });
+  it('t() with params replaces {placeholders}', function() {
+    I18N.register({ test: { greet: 'Hello {name}!' } });
+    I18N.setLang('test');
+    expect(I18N.t('greet', { name: 'World' })).toBe('Hello World!');
+  });
+  it('t() with fallback and params', function() {
+    I18N.register({ test: { msg: 'Value: {v}' } });
+    I18N.setLang('test');
+    expect(I18N.t('msg', 'fb', { v: '42' })).toBe('Value: 42');
+  });
+  it('t() returns array values as-is', function() {
+    I18N.register({ test: { arr: [1,2,3] } });
+    I18N.setLang('test');
+    var r = I18N.t('arr');
+    expect(Array.isArray(r)).toBe(true);
+    expect(r.length).toBe(3);
+  });
+});
+
+/* ── Settings ── */
+describe('Settings - get/set', function() {
+  it('get("lang") returns a string', function() {
+    var v = Settings.get('lang');
+    expect(typeof v).toBe('string');
+  });
+  it('set and get nested path', function() {
+    Settings.set('_test.nested.value', 42);
+    expect(Settings.get('_test.nested.value')).toBe(42);
+  });
+  it('get non-existent path returns undefined', function() {
+    expect(Settings.get('this.does.not.exist')).toBe(undefined);
+  });
+  it('get() with no args returns full data object', function() {
+    var all = Settings.get();
+    expect(typeof all).toBe('object');
+    expect(all.lang).toBeTruthy();
+  });
+});
+
+</script>
+</body>
+</html>

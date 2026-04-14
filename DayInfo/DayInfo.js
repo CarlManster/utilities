@@ -916,6 +916,18 @@ weekGrid.addEventListener('click', function (e) {
   });
 });
 
-Settings.ready.then(function () { init(); });
+if (window.__UNITTEST__) {
+  window._DayInfo = {
+    solarToLunar: solarToLunar, lunarToSolar: lunarToSolar,
+    gregorianToJD: gregorianToJD, jdToGregorian: jdToGregorian,
+    calcNewMoon: calcNewMoon, solarLon: solarLon,
+    solarDaysInMonth: solarDaysInMonth, lunarDaysInMonth: lunarDaysInMonth,
+    leapMonth: leapMonth, leapDays: leapDays, monthDays: monthDays, yearDays: yearDays,
+    pad2: pad2, fmtDate: fmtDate, fmtTz: fmtTz,
+    algoSolarToLunar: algoSolarToLunar, algoLunarToSolar: algoLunarToSolar
+  };
+} else {
+  Settings.ready.then(function () { init(); });
+}
 
 })();
