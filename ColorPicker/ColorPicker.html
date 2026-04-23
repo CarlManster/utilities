@@ -45,15 +45,14 @@
         <input type="number" class="num-input" id="numB" min="0" max="255" value="128">
       </div>
     </div>
-  </div>
-
-  <div class="preview-group">
-    <div class="color-preview" id="preview"></div>
-    <div class="hex-display" id="hexDisplay" data-i18n-title="click_to_copy" title="Click to copy">#808080</div>
+    <div class="hex-input-row">
+      <label for="hexInput" class="hex-input-label">HEX</label>
+      <input type="text" id="hexInput" class="hex-input" maxlength="7" value="#808080" spellcheck="false" autocomplete="off">
+    </div>
   </div>
 
   <div class="info-sections">
-    <div class="info-section">
+    <div class="info-section" data-copy-type="rgb" data-i18n-title="click_to_copy" title="Click to copy">
       <h2 data-i18n="rgb">RGB</h2>
       <div class="info-grid">
         <span class="info-label">R</span><span class="info-val" id="rgbR">128</span><span class="info-hex" id="rgbRh">80</span>
@@ -61,7 +60,7 @@
         <span class="info-label">B</span><span class="info-val" id="rgbB">128</span><span class="info-hex" id="rgbBh">80</span>
       </div>
     </div>
-    <div class="info-section">
+    <div class="info-section" data-copy-type="cmy" data-i18n-title="click_to_copy" title="Click to copy">
       <h2 data-i18n="cmy">CMY</h2>
       <div class="info-grid">
         <span class="info-label">C</span><span class="info-val" id="cmyC">127</span><span class="info-hex" id="cmyCh">7F</span>
@@ -69,7 +68,7 @@
         <span class="info-label">Y</span><span class="info-val" id="cmyY">127</span><span class="info-hex" id="cmyYh">7F</span>
       </div>
     </div>
-    <div class="info-section">
+    <div class="info-section" data-copy-type="hsb" data-i18n-title="click_to_copy" title="Click to copy">
       <h2 data-i18n="hsb">HSB</h2>
       <div class="info-grid">
         <span class="info-label">H</span><span class="info-val" id="hsbH">0°</span><span class="info-hex" id="hsbHh">-</span>
@@ -79,7 +78,7 @@
     </div>
   </div>
 
-  <div class="preview-group complementary-group">
+  <div class="complementary-group">
     <h2 data-i18n="complementary">Complementary</h2>
     <div class="complementary-row">
       <div class="color-preview" id="compPreview"></div>
@@ -97,7 +96,7 @@
 </div>
 
 <div class="center" id="bgArea">
-  <div class="center-label" id="centerLabel">#808080</div>
+  <div class="center-label" id="centerLabel" data-i18n-title="click_to_copy" title="Click to copy">#808080</div>
 </div>
 
 <div class="panel right-panel">

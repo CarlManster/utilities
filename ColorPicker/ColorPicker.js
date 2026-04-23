@@ -273,8 +273,16 @@ const numB = document.getElementById('numB');
 const valR = document.getElementById('valR');
 const valG = document.getElementById('valG');
 const valB = document.getElementById('valB');
+const hexInput = document.getElementById('hexInput');
 
 function clamp(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text);
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1500);
+}
 
 function update() {
   const r = clamp(+sliderR.value);
@@ -288,10 +296,14 @@ function update() {
   const hex = '#' + toHex2(r) + toHex2(g) + toHex2(b);
   const rgbStr = `rgb(${r}, ${g}, ${b})`;
 
-  // Background & preview
+  // Background
   document.body.style.backgroundColor = hex;
-  document.getElementById('preview').style.backgroundColor = hex;
-  document.getElementById('hexDisplay').textContent = hex;
+
+  // Hex input (only update if not focused, to avoid interrupting typing)
+  if (document.activeElement !== hexInput) {
+    hexInput.value = hex;
+    hexInput.classList.remove('invalid');
+  }
 
   // Center label
   const lum = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -377,19 +389,51 @@ numR.addEventListener('input', () => { sliderR.value = clamp(+numR.value); updat
 numG.addEventListener('input', () => { sliderG.value = clamp(+numG.value); update(); });
 numB.addEventListener('input', () => { sliderB.value = clamp(+numB.value); update(); });
 
-// Copy hex on click
-document.getElementById('hexDisplay').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('hexDisplay').textContent);
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 1500);
+// Copy on click
+document.getElementById('compHex').addEventListener('click', () => {
+  copyToClipboard(document.getElementById('compHex').textContent);
 });
 
-document.getElementById('compHex').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('compHex').textContent);
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 1500);
+document.getElementById('centerLabel').addEventListener('click', () => {
+  copyToClipboard(document.getElementById('centerLabel').textContent);
+});
+
+document.querySelectorAll('.info-section').forEach(section => {
+  section.addEventListener('click', () => {
+    const type = section.dataset.copyType;
+    let text = '';
+    if (type === 'rgb') {
+      text = `rgb(${document.getElementById('rgbR').textContent}, ${document.getElementById('rgbG').textContent}, ${document.getElementById('rgbB').textContent})`;
+    } else if (type === 'cmy') {
+      text = `cmy(${document.getElementById('cmyC').textContent}, ${document.getElementById('cmyM').textContent}, ${document.getElementById('cmyY').textContent})`;
+    } else if (type === 'hsb') {
+      text = `hsb(${document.getElementById('hsbH').textContent}, ${document.getElementById('hsbS').textContent}, ${document.getElementById('hsbB').textContent})`;
+    }
+    if (text) copyToClipboard(text);
+  });
+});
+
+// Hex input: accept direct entry like "FF0000" or "#FF0000"
+hexInput.addEventListener('input', () => {
+  const raw = hexInput.value.trim().replace(/^#/, '');
+  const m = /^([0-9a-fA-F]{6})$/.exec(raw);
+  if (m) {
+    const r = parseInt(m[1].slice(0, 2), 16);
+    const g = parseInt(m[1].slice(2, 4), 16);
+    const b = parseInt(m[1].slice(4, 6), 16);
+    sliderR.value = r; sliderG.value = g; sliderB.value = b;
+    hexInput.classList.remove('invalid');
+    update();
+  } else {
+    hexInput.classList.add('invalid');
+  }
+});
+hexInput.addEventListener('blur', () => {
+  const r = clamp(+sliderR.value);
+  const g = clamp(+sliderG.value);
+  const b = clamp(+sliderB.value);
+  hexInput.value = '#' + toHex2(r) + toHex2(g) + toHex2(b);
+  hexInput.classList.remove('invalid');
 });
 
 // Init
