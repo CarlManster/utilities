@@ -149,6 +149,12 @@ label {
   color: var(--subtle);
   font-family: 'Courier New', monospace;
   font-variant-numeric: tabular-nums;
+  transition: color 0.15s;
+}
+
+.char-count.at-limit {
+  color: #e74c3c;
+  font-weight: 700;
 }
 
 textarea {

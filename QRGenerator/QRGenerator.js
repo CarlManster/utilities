@@ -4,8 +4,24 @@ const placeholder = document.getElementById('qrPlaceholder');
 const errorEl = document.getElementById('qrError');
 const charCount = document.getElementById('charCount');
 
+// QR code capacity per mode at error correction level M.
+const MODE_LIMITS = { Numeric: 5596, Alphanumeric: 3391, Byte: 2331 };
+const NUMERIC_RE = /^[0-9]+$/;
+const ALPHANUMERIC_RE = /^[0-9A-Z $%*+\-./:]+$/;
+
+function detectMode(text) {
+  if (!text) return 'Byte';
+  if (NUMERIC_RE.test(text)) return 'Numeric';
+  if (ALPHANUMERIC_RE.test(text)) return 'Alphanumeric';
+  return 'Byte';
+}
+
 function updateCharCount() {
-  charCount.textContent = [...input.value].length;
+  const len = [...input.value].length;
+  const mode = detectMode(input.value);
+  const limit = MODE_LIMITS[mode];
+  charCount.textContent = `${len} / ${limit} (${mode})`;
+  charCount.classList.toggle('at-limit', len >= limit);
 }
 
 function resolveTheme() {
@@ -47,7 +63,7 @@ function render() {
 
   try {
     const qr = qrcode(0, 'M');
-    qr.addData(text);
+    qr.addData(text, detectMode(text));
     qr.make();
 
     const moduleCount = qr.getModuleCount();
