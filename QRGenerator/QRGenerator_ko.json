@@ -5,5 +5,8 @@
   "text_label": "텍스트",
   "input_placeholder": "URL 또는 텍스트를 입력하세요...",
   "error_lib": "QR 라이브러리를 불러오지 못했습니다.",
-  "error_generate": "QR 코드를 생성할 수 없습니다: "
+  "error_generate": "QR 코드를 생성할 수 없습니다: ",
+  "recent_title": "최근",
+  "recent_empty": "최근 항목이 없습니다",
+  "save_btn": "저장"
 }

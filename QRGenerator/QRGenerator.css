@@ -70,9 +70,17 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
-.container {
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
   width: 100%;
-  max-width: 460px;
+  max-width: 780px;
+}
+
+.container {
+  flex: 1;
+  min-width: 0;
   background: var(--panel-bg);
   border-radius: 16px;
   box-shadow: var(--shadow);
@@ -81,6 +89,80 @@ body {
   flex-direction: column;
   gap: 24px;
   transition: background 0.2s, box-shadow 0.2s;
+}
+
+.recent-panel {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--panel-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.recent-panel h2 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--subtle);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.recent-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recent-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--input-bg);
+}
+
+.recent-item:hover {
+  border-color: var(--input-focus);
+}
+
+.recent-text {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-date {
+  font-size: 11px;
+  color: var(--subtle);
+  font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.recent-empty {
+  font-size: 12px;
+  color: var(--subtle);
+  text-align: center;
+  padding: 16px 8px;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    flex-direction: column;
+    max-width: 460px;
+  }
+  .recent-panel {
+    width: 100%;
+  }
 }
 
 h1 {
@@ -157,8 +239,15 @@ label {
   font-weight: 700;
 }
 
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
 textarea {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   min-height: 90px;
   padding: 12px 14px;
   border: 1.5px solid var(--input-border);
@@ -174,6 +263,29 @@ textarea {
 textarea:focus {
   outline: none;
   border-color: var(--input-focus);
+}
+
+.save-btn {
+  flex-shrink: 0;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: #0071e3;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.save-btn:hover:not(:disabled) { background: #005bbb; }
+.save-btn:active:not(:disabled) { background: #004999; }
+.save-btn:disabled {
+  background: var(--input-border);
+  color: var(--subtle);
+  cursor: not-allowed;
 }
 
 .error {

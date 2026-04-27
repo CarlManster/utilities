@@ -5,5 +5,8 @@
   "text_label": "テキスト",
   "input_placeholder": "URLまたはテキストを入力...",
   "error_lib": "QRライブラリを読み込めませんでした。",
-  "error_generate": "QRコードを生成できません: "
+  "error_generate": "QRコードを生成できません: ",
+  "recent_title": "最近",
+  "recent_empty": "最近の項目がありません",
+  "save_btn": "保存"
 }

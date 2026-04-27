@@ -3,6 +3,13 @@ const qrArea = document.getElementById('qrArea');
 const placeholder = document.getElementById('qrPlaceholder');
 const errorEl = document.getElementById('qrError');
 const charCount = document.getElementById('charCount');
+const recentListEl = document.getElementById('recentList');
+const saveBtn = document.getElementById('saveBtn');
+
+const RECENT_COOKIE = 'utilities_qr_recent';
+const MAX_RECENT = 10;
+const RECENT_DISPLAY_MAX = 60;
+let recent = [];
 
 // QR code capacity per mode at error correction level M.
 const MODE_LIMITS = { Numeric: 5596, Alphanumeric: 3391, Byte: 2331 };
@@ -22,6 +29,10 @@ function updateCharCount() {
   const limit = MODE_LIMITS[mode];
   charCount.textContent = `${len} / ${limit} (${mode})`;
   charCount.classList.toggle('at-limit', len >= limit);
+}
+
+function updateSaveBtn() {
+  saveBtn.disabled = !input.value.trim() || !!errorEl.textContent;
 }
 
 function resolveTheme() {
@@ -97,9 +108,94 @@ function render() {
   }
 }
 
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function renderRecent() {
+  recentListEl.innerHTML = '';
+  if (recent.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'recent-empty';
+    empty.textContent = I18N.t('recent_empty', 'No recent items');
+    recentListEl.appendChild(empty);
+    return;
+  }
+  recent.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'recent-item';
+    li.title = item.text;
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'recent-text';
+    textDiv.textContent = item.text.length > RECENT_DISPLAY_MAX
+      ? item.text.slice(0, RECENT_DISPLAY_MAX) + '…'
+      : item.text;
+
+    const dateDiv = document.createElement('div');
+    dateDiv.className = 'recent-date';
+    dateDiv.textContent = formatDate(item.date);
+
+    li.appendChild(textDiv);
+    li.appendChild(dateDiv);
+    li.addEventListener('click', () => {
+      input.value = item.text;
+      updateCharCount();
+      render();
+      input.focus();
+    });
+    recentListEl.appendChild(li);
+  });
+}
+
+function loadRecent() {
+  if (typeof Settings === 'undefined' || !Settings.readEncryptedCookie) {
+    renderRecent();
+    return;
+  }
+  Settings.readEncryptedCookie(RECENT_COOKIE).then(json => {
+    if (json) {
+      try {
+        const arr = JSON.parse(json);
+        if (Array.isArray(arr)) {
+          recent = arr
+            .filter(it => it && typeof it.text === 'string')
+            .slice(0, MAX_RECENT);
+        }
+      } catch (e) {}
+    }
+    renderRecent();
+  });
+}
+
+function saveRecent() {
+  if (typeof Settings === 'undefined' || !Settings.writeEncryptedCookie) return;
+  Settings.writeEncryptedCookie(RECENT_COOKIE, JSON.stringify(recent));
+}
+
+function addRecent(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return;
+  recent = recent.filter(item => item.text !== trimmed);
+  recent.unshift({ text: trimmed, date: new Date().toISOString() });
+  if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
+  saveRecent();
+  renderRecent();
+}
+
 input.addEventListener('input', () => {
   updateCharCount();
   render();
+  updateSaveBtn();
+});
+
+saveBtn.addEventListener('click', () => {
+  if (saveBtn.disabled) return;
+  addRecent(input.value);
 });
 
 // Re-render when theme changes (system preference or data-theme attribute).
@@ -111,7 +207,12 @@ new MutationObserver(render).observe(document.documentElement, {
 
 updateCharCount();
 render();
+renderRecent();
+updateSaveBtn();
 
 if (typeof Settings !== 'undefined' && Settings.ready) {
-  Settings.ready.then(render);
+  Settings.ready.then(() => {
+    render();
+    loadRecent();
+  });
 }

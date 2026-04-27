@@ -5,5 +5,8 @@
   "text_label": "TEXT",
   "input_placeholder": "Enter a URL or text...",
   "error_lib": "Failed to load the QR library.",
-  "error_generate": "Could not generate QR code: "
+  "error_generate": "Could not generate QR code: ",
+  "recent_title": "Recent",
+  "recent_empty": "No recent items",
+  "save_btn": "Save"
 }

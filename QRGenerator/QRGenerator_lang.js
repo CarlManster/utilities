@@ -6,7 +6,10 @@ I18N.register({
     "text_label": "TEXT",
     "input_placeholder": "Enter a URL or text...",
     "error_lib": "Failed to load the QR library.",
-    "error_generate": "Could not generate QR code: "
+    "error_generate": "Could not generate QR code: ",
+    "recent_title": "Recent",
+    "recent_empty": "No recent items",
+    "save_btn": "Save"
   },
   "ko": {
     "title": "QR 코드 생성기",
@@ -15,7 +18,10 @@ I18N.register({
     "text_label": "텍스트",
     "input_placeholder": "URL 또는 텍스트를 입력하세요...",
     "error_lib": "QR 라이브러리를 불러오지 못했습니다.",
-    "error_generate": "QR 코드를 생성할 수 없습니다: "
+    "error_generate": "QR 코드를 생성할 수 없습니다: ",
+    "recent_title": "최근",
+    "recent_empty": "최근 항목이 없습니다",
+    "save_btn": "저장"
   },
   "jp": {
     "title": "QRコードジェネレーター",
@@ -24,6 +30,9 @@ I18N.register({
     "text_label": "テキスト",
     "input_placeholder": "URLまたはテキストを入力...",
     "error_lib": "QRライブラリを読み込めませんでした。",
-    "error_generate": "QRコードを生成できません: "
+    "error_generate": "QRコードを生成できません: ",
+    "recent_title": "最近",
+    "recent_empty": "最近の項目がありません",
+    "save_btn": "保存"
   }
 });

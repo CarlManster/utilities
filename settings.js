@@ -166,8 +166,27 @@ var Settings = (function () {
     }
   }
 
+  /* -- Generic encrypted cookie helpers (use the same key/scheme as the main settings cookie) -- */
+  function readEncryptedCookie(name) {
+    var raw = readCookie(name);
+    if (!raw) return Promise.resolve(null);
+    return decrypt(raw);
+  }
+
+  function writeEncryptedCookie(name, text) {
+    return encrypt(text).then(function (val) { writeCookie(name, val); });
+  }
+
   // Auto-init
   init();
 
-  return { ready: _ready, get: get, set: set, save: save, applyScreenMode: applyScreenMode };
+  return {
+    ready: _ready,
+    get: get,
+    set: set,
+    save: save,
+    applyScreenMode: applyScreenMode,
+    readEncryptedCookie: readEncryptedCookie,
+    writeEncryptedCookie: writeEncryptedCookie
+  };
 })();
