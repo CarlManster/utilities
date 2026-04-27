@@ -1,0 +1,9 @@
+{
+  "title": "QRコードジェネレーター",
+  "subtitle": "テキストを入力すると自動的にQRコードが生成されます",
+  "qr_placeholder": "下にテキストを入力してください",
+  "text_label": "テキスト",
+  "input_placeholder": "URLまたはテキストを入力...",
+  "error_lib": "QRライブラリを読み込めませんでした。",
+  "error_generate": "QRコードを生成できません: "
+}

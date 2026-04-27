@@ -1,0 +1,9 @@
+{
+  "title": "QR Code Generator",
+  "subtitle": "Type text to automatically generate a QR code",
+  "qr_placeholder": "Enter text below",
+  "text_label": "TEXT",
+  "input_placeholder": "Enter a URL or text...",
+  "error_lib": "Failed to load the QR library.",
+  "error_generate": "Could not generate QR code: "
+}
