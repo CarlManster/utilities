@@ -1,3 +1,58 @@
+(function () {
+'use strict';
+
+// === Constants ===
+const RECENT_COOKIE = 'utilities_qr_recent';
+const MAX_RECENT = 10;
+const RECENT_DISPLAY_MAX = 60;
+
+// QR code capacity per mode at error correction level M.
+const MODE_LIMITS = { Numeric: 5596, Alphanumeric: 3391, Byte: 2331 };
+const NUMERIC_RE = /^[0-9]+$/;
+const ALPHANUMERIC_RE = /^[0-9A-Z $%*+\-./:]+$/;
+
+// === Pure helpers (testable) ===
+
+function detectMode(text) {
+  if (!text) return 'Byte';
+  if (NUMERIC_RE.test(text)) return 'Numeric';
+  if (ALPHANUMERIC_RE.test(text)) return 'Alphanumeric';
+  return 'Byte';
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function truncateForDisplay(text, max) {
+  if (text == null) return '';
+  if (text.length <= max) return text;
+  return text.slice(0, max) + '…';
+}
+
+// Pure function for adding a new entry to the recent list with dedup + cap.
+function computeAddRecent(list, text, date, max) {
+  const trimmed = (text || '').trim();
+  if (!trimmed) return list.slice();
+  const filtered = list.filter(it => it && it.text !== trimmed);
+  filtered.unshift({ text: trimmed, date: date || new Date().toISOString() });
+  return filtered.slice(0, max);
+}
+
+// === Expose for unit tests, then bail out before touching DOM ===
+if (typeof window !== 'undefined' && window.__UNITTEST__) {
+  window._QRGenerator = {
+    detectMode, pad2, formatDate, truncateForDisplay, computeAddRecent,
+    MODE_LIMITS, MAX_RECENT, RECENT_DISPLAY_MAX,
+  };
+  return;
+}
+
+// === DOM refs ===
 const input = document.getElementById('qrInput');
 const qrArea = document.getElementById('qrArea');
 const placeholder = document.getElementById('qrPlaceholder');
@@ -5,22 +60,15 @@ const errorEl = document.getElementById('qrError');
 const charCount = document.getElementById('charCount');
 const recentListEl = document.getElementById('recentList');
 const saveBtn = document.getElementById('saveBtn');
+const srStatus = document.getElementById('srStatus');
 
-const RECENT_COOKIE = 'utilities_qr_recent';
-const MAX_RECENT = 10;
-const RECENT_DISPLAY_MAX = 60;
 let recent = [];
 
-// QR code capacity per mode at error correction level M.
-const MODE_LIMITS = { Numeric: 5596, Alphanumeric: 3391, Byte: 2331 };
-const NUMERIC_RE = /^[0-9]+$/;
-const ALPHANUMERIC_RE = /^[0-9A-Z $%*+\-./:]+$/;
-
-function detectMode(text) {
-  if (!text) return 'Byte';
-  if (NUMERIC_RE.test(text)) return 'Numeric';
-  if (ALPHANUMERIC_RE.test(text)) return 'Alphanumeric';
-  return 'Byte';
+function announce(msg) {
+  if (!srStatus) return;
+  srStatus.textContent = '';
+  // Re-set on next tick so SRs notice the change even when text repeats.
+  setTimeout(() => { srStatus.textContent = msg; }, 30);
 }
 
 function updateCharCount() {
@@ -56,6 +104,15 @@ function clearCanvases() {
   qrArea.querySelectorAll('canvas').forEach(c => c.remove());
 }
 
+function setQRAreaLabel(text) {
+  if (!text) {
+    qrArea.setAttribute('aria-label', I18N.t('aria_qr_area_empty', 'QR code preview (empty)'));
+  } else {
+    const preview = truncateForDisplay(text, 60);
+    qrArea.setAttribute('aria-label', I18N.t('aria_qr_area_for', 'QR code for: {text}', { text: preview }));
+  }
+}
+
 function render() {
   const text = input.value;
   clearCanvases();
@@ -63,12 +120,14 @@ function render() {
   if (!text) {
     placeholder.hidden = false;
     errorEl.textContent = '';
+    setQRAreaLabel('');
     return;
   }
 
   if (typeof qrcode !== 'function') {
     placeholder.hidden = false;
     errorEl.textContent = I18N.t('error_lib', 'Failed to load the QR library.');
+    setQRAreaLabel('');
     return;
   }
 
@@ -85,6 +144,7 @@ function render() {
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
+    canvas.setAttribute('role', 'img');
 
     const ctx = canvas.getContext('2d');
     const colors = getQRColors();
@@ -102,18 +162,21 @@ function render() {
     qrArea.appendChild(canvas);
     placeholder.hidden = true;
     errorEl.textContent = '';
+    setQRAreaLabel(text);
   } catch (e) {
     placeholder.hidden = false;
     errorEl.textContent = I18N.t('error_generate', 'Could not generate QR code: ') + e.message;
+    setQRAreaLabel('');
   }
 }
 
-function pad2(n) { return String(n).padStart(2, '0'); }
-
-function formatDate(iso) {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+function loadRecentItem(item) {
+  input.value = item.text;
+  updateCharCount();
+  render();
+  updateSaveBtn();
+  input.focus();
+  announce(I18N.t('announce_loaded', 'Loaded recent item'));
 }
 
 function renderRecent() {
@@ -127,27 +190,27 @@ function renderRecent() {
   }
   recent.forEach(item => {
     const li = document.createElement('li');
-    li.className = 'recent-item';
-    li.title = item.text;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'recent-item';
+    btn.title = item.text;
+    btn.setAttribute('aria-label', I18N.t('aria_recent_item', 'Load recent: {text}', {
+      text: truncateForDisplay(item.text, 80)
+    }));
 
     const textDiv = document.createElement('div');
     textDiv.className = 'recent-text';
-    textDiv.textContent = item.text.length > RECENT_DISPLAY_MAX
-      ? item.text.slice(0, RECENT_DISPLAY_MAX) + '…'
-      : item.text;
+    textDiv.textContent = truncateForDisplay(item.text, RECENT_DISPLAY_MAX);
 
     const dateDiv = document.createElement('div');
     dateDiv.className = 'recent-date';
     dateDiv.textContent = formatDate(item.date);
 
-    li.appendChild(textDiv);
-    li.appendChild(dateDiv);
-    li.addEventListener('click', () => {
-      input.value = item.text;
-      updateCharCount();
-      render();
-      input.focus();
-    });
+    btn.appendChild(textDiv);
+    btn.appendChild(dateDiv);
+    btn.addEventListener('click', () => loadRecentItem(item));
+
+    li.appendChild(btn);
     recentListEl.appendChild(li);
   });
 }
@@ -178,19 +241,27 @@ function saveRecent() {
 }
 
 function addRecent(text) {
-  const trimmed = text.trim();
-  if (!trimmed) return;
-  recent = recent.filter(item => item.text !== trimmed);
-  recent.unshift({ text: trimmed, date: new Date().toISOString() });
-  if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
+  if (!text.trim()) return;
+  recent = computeAddRecent(recent, text, null, MAX_RECENT);
   saveRecent();
   renderRecent();
+  announce(I18N.t('announce_saved', 'Saved to recent list'));
 }
 
 input.addEventListener('input', () => {
   updateCharCount();
   render();
   updateSaveBtn();
+});
+
+// Ctrl/Cmd + Enter inside textarea = save
+input.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (!saveBtn.disabled) {
+      addRecent(input.value);
+    }
+  }
 });
 
 saveBtn.addEventListener('click', () => {
@@ -216,3 +287,5 @@ if (typeof Settings !== 'undefined' && Settings.ready) {
     loadRecent();
   });
 }
+
+})();

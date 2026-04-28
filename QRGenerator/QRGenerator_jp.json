@@ -8,5 +8,15 @@
   "error_generate": "QRコードを生成できません: ",
   "recent_title": "最近",
   "recent_empty": "最近の項目がありません",
-  "save_btn": "保存"
+  "save_btn": "保存",
+  "aria_main": "QRコードジェネレーター",
+  "aria_qr_area_empty": "QRコードプレビュー (空)",
+  "aria_qr_area_for": "QRコード: {text}",
+  "aria_char_count": "文字数",
+  "aria_save_btn": "現在のテキストを最近の一覧に保存",
+  "aria_recent_panel": "最近のQRコード",
+  "aria_recent_item": "最近の項目を読み込む: {text}",
+  "hint_save_shortcut": "保存するには Ctrl または Command キーと Enter を押してください。",
+  "announce_saved": "最近の一覧に保存しました",
+  "announce_loaded": "最近の項目を読み込みました"
 }

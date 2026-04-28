@@ -17,7 +17,7 @@ var Settings = (function () {
     return m ? decodeURIComponent(m[2]) : '';
   }
   function writeCookie(name, val) {
-    var d = new Date(); d.setFullYear(d.getFullYear() + 1);
+    var d = new Date(); d.setFullYear(d.getFullYear() + 5);
     document.cookie = name + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/';
   }
   function deleteCookie(name) {

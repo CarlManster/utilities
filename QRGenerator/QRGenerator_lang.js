@@ -9,7 +9,17 @@ I18N.register({
     "error_generate": "Could not generate QR code: ",
     "recent_title": "Recent",
     "recent_empty": "No recent items",
-    "save_btn": "Save"
+    "save_btn": "Save",
+    "aria_main": "QR code generator",
+    "aria_qr_area_empty": "QR code preview (empty)",
+    "aria_qr_area_for": "QR code for: {text}",
+    "aria_char_count": "Character count",
+    "aria_save_btn": "Save current text to recent list",
+    "aria_recent_panel": "Recent QR codes",
+    "aria_recent_item": "Load recent: {text}",
+    "hint_save_shortcut": "Press Control or Command plus Enter to save.",
+    "announce_saved": "Saved to recent list",
+    "announce_loaded": "Loaded recent item"
   },
   "ko": {
     "title": "QR 코드 생성기",
@@ -21,7 +31,17 @@ I18N.register({
     "error_generate": "QR 코드를 생성할 수 없습니다: ",
     "recent_title": "최근",
     "recent_empty": "최근 항목이 없습니다",
-    "save_btn": "저장"
+    "save_btn": "저장",
+    "aria_main": "QR 코드 생성기",
+    "aria_qr_area_empty": "QR 코드 미리보기 (비어 있음)",
+    "aria_qr_area_for": "QR 코드: {text}",
+    "aria_char_count": "글자수",
+    "aria_save_btn": "현재 텍스트를 최근 목록에 저장",
+    "aria_recent_panel": "최근 QR 코드 목록",
+    "aria_recent_item": "최근 항목 불러오기: {text}",
+    "hint_save_shortcut": "저장하려면 Ctrl 또는 Command 키와 Enter 키를 누르세요.",
+    "announce_saved": "최근 목록에 저장되었습니다",
+    "announce_loaded": "최근 항목을 불러왔습니다"
   },
   "jp": {
     "title": "QRコードジェネレーター",
@@ -33,6 +53,16 @@ I18N.register({
     "error_generate": "QRコードを生成できません: ",
     "recent_title": "最近",
     "recent_empty": "最近の項目がありません",
-    "save_btn": "保存"
+    "save_btn": "保存",
+    "aria_main": "QRコードジェネレーター",
+    "aria_qr_area_empty": "QRコードプレビュー (空)",
+    "aria_qr_area_for": "QRコード: {text}",
+    "aria_char_count": "文字数",
+    "aria_save_btn": "現在のテキストを最近の一覧に保存",
+    "aria_recent_panel": "最近のQRコード",
+    "aria_recent_item": "最近の項目を読み込む: {text}",
+    "hint_save_shortcut": "保存するには Ctrl または Command キーと Enter を押してください。",
+    "announce_saved": "最近の一覧に保存しました",
+    "announce_loaded": "最近の項目を読み込みました"
   }
 });

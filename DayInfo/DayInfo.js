@@ -553,8 +553,10 @@ function init() {
   document.getElementById('weekCount').addEventListener('change', function () { render(); });
   leapCheck.addEventListener('change', onChange);
 
+  document.getElementById('btnPrevWeek').addEventListener('click', function () { shiftDay(-7); });
   document.getElementById('btnPrev').addEventListener('click', function () { shiftDay(-1); });
   document.getElementById('btnNext').addEventListener('click', function () { shiftDay(1); });
+  document.getElementById('btnNextWeek').addEventListener('click', function () { shiftDay(7); });
   document.getElementById('btnToday').addEventListener('click', goToday);
   document.getElementById('btnApiKey').addEventListener('click', promptServiceKey);
   document.getElementById('btnEpochGo').addEventListener('click', applyEpoch);
@@ -873,16 +875,23 @@ function updateNavButtons() {
   var y = parseInt(yearInput.value, 10);
   var m = parseInt(monthSelect.value, 10);
   var d = parseInt(daySelect.value, 10);
+  var prevWeek = document.getElementById('btnPrevWeek');
   var prev = document.getElementById('btnPrev');
   var next = document.getElementById('btnNext');
+  var nextWeek = document.getElementById('btnNextWeek');
 
+  var atMin, atMax;
   if (calType.value === 'solar') {
-    prev.disabled = (y <= 1 && m <= 1 && d <= 1);
-    next.disabled = (y >= 5000 && m >= 12 && d >= 31);
+    atMin = (y <= 1 && m <= 1 && d <= 1);
+    atMax = (y >= 5000 && m >= 12 && d >= 31);
   } else {
-    prev.disabled = (y <= 1 && m <= 1 && d <= 1);
-    next.disabled = (y >= 5000 && m >= 12 && d >= 30);
+    atMin = (y <= 1 && m <= 1 && d <= 1);
+    atMax = (y >= 5000 && m >= 12 && d >= 30);
   }
+  prev.disabled = atMin;
+  prevWeek.disabled = atMin;
+  next.disabled = atMax;
+  nextWeek.disabled = atMax;
 }
 
 function showBanner(msg) {

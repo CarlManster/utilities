@@ -118,19 +118,30 @@ body {
 }
 
 .recent-item {
+  width: 100%;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
   display: flex;
   flex-direction: column;
   gap: 2px;
   background: var(--input-bg);
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text);
 }
 
 .recent-item:hover {
   border-color: var(--input-focus);
+}
+
+.recent-item:focus-visible {
+  outline: none;
+  border-color: #0071e3;
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.35);
 }
 
 .recent-text {
@@ -263,6 +274,28 @@ textarea {
 textarea:focus {
   outline: none;
   border-color: var(--input-focus);
+}
+
+textarea:focus-visible {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.35);
+}
+
+.save-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.45);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .save-btn {

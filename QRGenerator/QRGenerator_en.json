@@ -8,5 +8,15 @@
   "error_generate": "Could not generate QR code: ",
   "recent_title": "Recent",
   "recent_empty": "No recent items",
-  "save_btn": "Save"
+  "save_btn": "Save",
+  "aria_main": "QR code generator",
+  "aria_qr_area_empty": "QR code preview (empty)",
+  "aria_qr_area_for": "QR code for: {text}",
+  "aria_char_count": "Character count",
+  "aria_save_btn": "Save current text to recent list",
+  "aria_recent_panel": "Recent QR codes",
+  "aria_recent_item": "Load recent: {text}",
+  "hint_save_shortcut": "Press Control or Command plus Enter to save.",
+  "announce_saved": "Saved to recent list",
+  "announce_loaded": "Loaded recent item"
 }

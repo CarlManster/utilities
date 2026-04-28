@@ -106,6 +106,8 @@ function analyticalExpectedValue(faces, numDice, isProduct) {
 </script>
 <script src="DayInfo/DayInfo_lang.js"></script>
 <script src="DayInfo/DayInfo.js"></script>
+<script src="QRGenerator/QRGenerator_lang.js"></script>
+<script src="QRGenerator/QRGenerator.js"></script>
 
 <script>
 /* ══════════════════════════════════════
@@ -444,6 +446,116 @@ describe('I18N - Translation', function() {
     var r = I18N.t('arr');
     expect(Array.isArray(r)).toBe(true);
     expect(r.length).toBe(3);
+  });
+});
+
+/* ── QRGenerator ── */
+var Q = window._QRGenerator || {};
+
+describe('QRGenerator - detectMode', function() {
+  it('empty string → Byte', function() { expect(Q.detectMode('')).toBe('Byte'); });
+  it('all digits → Numeric', function() { expect(Q.detectMode('1234567890')).toBe('Numeric'); });
+  it('uppercase + digits + space → Alphanumeric', function() {
+    expect(Q.detectMode('HELLO WORLD 123')).toBe('Alphanumeric');
+  });
+  it('alphanumeric symbols ($%*+-./:) → Alphanumeric', function() {
+    expect(Q.detectMode('A:B/C.D-E+F*G%H$I')).toBe('Alphanumeric');
+  });
+  it('lowercase → Byte (alphanumeric mode is uppercase only)', function() {
+    expect(Q.detectMode('hello')).toBe('Byte');
+  });
+  it('Korean chars → Byte', function() { expect(Q.detectMode('안녕하세요')).toBe('Byte'); });
+  it('emoji → Byte', function() { expect(Q.detectMode('hi 🎉')).toBe('Byte'); });
+  it('https URL → Byte (lowercase)', function() {
+    expect(Q.detectMode('https://example.com')).toBe('Byte');
+  });
+  it('HTTPS URL uppercase → Alphanumeric', function() {
+    expect(Q.detectMode('HTTPS://EXAMPLE.COM')).toBe('Alphanumeric');
+  });
+});
+
+describe('QRGenerator - MODE_LIMITS', function() {
+  it('Numeric limit = 5596', function() { expect(Q.MODE_LIMITS.Numeric).toBe(5596); });
+  it('Alphanumeric limit = 3391', function() { expect(Q.MODE_LIMITS.Alphanumeric).toBe(3391); });
+  it('Byte limit = 2331', function() { expect(Q.MODE_LIMITS.Byte).toBe(2331); });
+});
+
+describe('QRGenerator - pad2', function() {
+  it('pad2(0) → "00"', function() { expect(Q.pad2(0)).toBe('00'); });
+  it('pad2(5) → "05"', function() { expect(Q.pad2(5)).toBe('05'); });
+  it('pad2(10) → "10"', function() { expect(Q.pad2(10)).toBe('10'); });
+  it('pad2(99) → "99"', function() { expect(Q.pad2(99)).toBe('99'); });
+});
+
+describe('QRGenerator - formatDate', function() {
+  it('valid ISO → "YYYY-MM-DD HH:MM"', function() {
+    var s = Q.formatDate('2026-04-13T09:05:00');
+    expect(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(s)).toBe(true);
+  });
+  it('invalid input → empty string', function() {
+    expect(Q.formatDate('not-a-date')).toBe('');
+  });
+});
+
+describe('QRGenerator - truncateForDisplay', function() {
+  it('null/undefined → ""', function() {
+    expect(Q.truncateForDisplay(null, 10)).toBe('');
+    expect(Q.truncateForDisplay(undefined, 10)).toBe('');
+  });
+  it('short text returned as-is', function() {
+    expect(Q.truncateForDisplay('hello', 10)).toBe('hello');
+  });
+  it('exact length returned as-is', function() {
+    expect(Q.truncateForDisplay('1234567890', 10)).toBe('1234567890');
+  });
+  it('long text gets ellipsis appended', function() {
+    expect(Q.truncateForDisplay('1234567890abc', 10)).toBe('1234567890…');
+  });
+});
+
+describe('QRGenerator - computeAddRecent', function() {
+  it('adds new item to front', function() {
+    var out = Q.computeAddRecent([], 'hello', '2026-04-13T00:00:00Z', 5);
+    expect(out.length).toBe(1);
+    expect(out[0].text).toBe('hello');
+    expect(out[0].date).toBe('2026-04-13T00:00:00Z');
+  });
+  it('trims whitespace before storing', function() {
+    var out = Q.computeAddRecent([], '  hello  ', '2026-04-13T00:00:00Z', 5);
+    expect(out[0].text).toBe('hello');
+  });
+  it('empty / whitespace text returns list unchanged', function() {
+    var list = [{ text: 'a', date: 'x' }];
+    expect(Q.computeAddRecent(list, '', null, 5).length).toBe(1);
+    expect(Q.computeAddRecent(list, '   ', null, 5).length).toBe(1);
+  });
+  it('dedups by text and moves to front', function() {
+    var list = [
+      { text: 'a', date: '2026-01-01T00:00:00Z' },
+      { text: 'b', date: '2026-01-02T00:00:00Z' },
+    ];
+    var out = Q.computeAddRecent(list, 'a', '2026-01-03T00:00:00Z', 5);
+    expect(out.length).toBe(2);
+    expect(out[0].text).toBe('a');
+    expect(out[0].date).toBe('2026-01-03T00:00:00Z');
+    expect(out[1].text).toBe('b');
+  });
+  it('caps at max length, dropping the oldest', function() {
+    var list = [
+      { text: '1', date: 'd1' }, { text: '2', date: 'd2' },
+      { text: '3', date: 'd3' }, { text: '4', date: 'd4' },
+      { text: '5', date: 'd5' },
+    ];
+    var out = Q.computeAddRecent(list, 'new', 'dn', 5);
+    expect(out.length).toBe(5);
+    expect(out[0].text).toBe('new');
+    expect(out[4].text).toBe('4');
+  });
+  it('does not mutate the input list', function() {
+    var list = [{ text: 'a', date: 'd' }];
+    Q.computeAddRecent(list, 'b', 'd2', 5);
+    expect(list.length).toBe(1);
+    expect(list[0].text).toBe('a');
   });
 });
 
