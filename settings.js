@@ -1,13 +1,17 @@
 var Settings = (function () {
   var COOKIE = 'utilities_setting';
-  var SALT = 'utilities_setting_salt';
+  var DB_NAME = 'utilities_keystore';
+  var DB_VERSION = 1;
+  var DB_STORE = 'keys';
+  var DB_KEY_ID = 'master';
+
   var _data = {
     lang: 'en', defaultpage: null, lastpage: '',
     dayInfo: {}, dice: {}, colorpicker: {}, jsonvisualizer: {},
     repayment: { principal: 100000000, period: 120, holding: 0, interest: 3.0 }
   };
   var _key = null;
-  var _useCrypto = !!(window.crypto && window.crypto.subtle);
+  var _useCrypto = !!(window.crypto && window.crypto.subtle && window.indexedDB);
   var _readyResolve;
   var _ready = new Promise(function (r) { _readyResolve = r; });
 
@@ -24,14 +28,61 @@ var Settings = (function () {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
   }
 
-  /* -- Crypto helpers -- */
-  function deriveKey(visitorId) {
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(visitorId))
-      .then(function (hash) {
-        return crypto.subtle.importKey('raw', hash, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
-      });
+  /* -- IndexedDB-backed CryptoKey -- */
+  // The AES-GCM key is generated once with extractable:false and persisted as a
+  // CryptoKey object in IndexedDB. The raw bytes never leave the browser, so the
+  // settings cookie can only be decrypted by code running in this origin.
+  function openDB() {
+    return new Promise(function (resolve, reject) {
+      var req;
+      try { req = indexedDB.open(DB_NAME, DB_VERSION); }
+      catch (e) { reject(e); return; }
+      req.onupgradeneeded = function () {
+        var db = req.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+      req.onblocked = function () { reject(new Error('idb blocked')); };
+    });
   }
 
+  function idbGet(db, id) {
+    return new Promise(function (resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readonly');
+      var req = tx.objectStore(DB_STORE).get(id);
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+
+  function idbPut(db, id, value) {
+    return new Promise(function (resolve, reject) {
+      var tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(value, id);
+      tx.oncomplete = function () { resolve(); };
+      tx.onerror = function () { reject(tx.error); };
+      tx.onabort = function () { reject(tx.error); };
+    });
+  }
+
+  function loadOrCreateKey() {
+    if (!_useCrypto) return Promise.resolve(null);
+    return openDB().then(function (db) {
+      return idbGet(db, DB_KEY_ID).then(function (existing) {
+        if (existing) return existing;
+        return crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        ).then(function (key) {
+          return idbPut(db, DB_KEY_ID, key).then(function () { return key; });
+        });
+      });
+    }).catch(function () { return null; });
+  }
+
+  /* -- Crypto helpers -- */
   function encrypt(text) {
     if (!_useCrypto || !_key) return Promise.resolve(btoa(unescape(encodeURIComponent(text))));
     var iv = crypto.getRandomValues(new Uint8Array(12));
@@ -76,19 +127,7 @@ var Settings = (function () {
 
   /* -- Init -- */
   function init() {
-    var fpReady;
-    try {
-      fpReady = FingerprintJS.load().then(function (fp) { return fp.get(); });
-    } catch (e) {
-      fpReady = Promise.resolve(null);
-    }
-
-    return fpReady.then(function (result) {
-      if (result && _useCrypto) {
-        return deriveKey(result.visitorId);
-      }
-      return null;
-    }).then(function (key) {
+    return loadOrCreateKey().then(function (key) {
       _key = key;
       if (!_key) _useCrypto = false;
 
@@ -103,11 +142,9 @@ var Settings = (function () {
           }
         });
       } else {
-        // Try migrating old cookies
         if (migrateOld()) return save();
       }
     }).then(function () {
-      // Apply URL param overrides
       try {
         var params = new URLSearchParams(location.search);
         var urlLang = params.get('lang');
@@ -116,17 +153,15 @@ var Settings = (function () {
         if (urlTheme) _data.screenmode = urlTheme;
       } catch (e) {}
 
-      // Set I18N language
       if (typeof I18N !== 'undefined' && I18N.setLang) {
         I18N.setLang(_data.lang || 'en');
       }
 
-      // Apply screen mode
       applyScreenMode(_data.screenmode || 'auto');
 
       _readyResolve();
     }).catch(function () {
-      _readyResolve(); // resolve even on error
+      _readyResolve();
     });
   }
 

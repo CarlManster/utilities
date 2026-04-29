@@ -87,8 +87,6 @@ h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
     return origQuerySelector(sel) || Object.create(fakeEl);
   };
   window.Option = window.Option || function(t,v){ this.text=t; this.value=v; };
-  // Stub FingerprintJS
-  window.FingerprintJS = { load: function(){ return Promise.resolve({ get: function(){ return Promise.resolve({ visitorId:'test-id-12345' }); } }); } };
 })();
 </script>
 

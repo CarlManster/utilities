@@ -76,9 +76,11 @@ Dynamic strings (errors, announcements) use `I18N.t(key, fallback, {param: ...})
 A single IIFE module exposing `Settings.{ready, get, set, save, applyScreenMode, readEncryptedCookie, writeEncryptedCookie}`.
 
 Storage scheme:
-1. Derive a per-device key: SHA-256 of the FingerprintJS `visitorId`, imported as an AES-GCM key via `window.crypto.subtle`.
+1. Per-origin AES-GCM key: generated once via `crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ...)` with `extractable: false` and persisted as a `CryptoKey` object in IndexedDB (`utilities_keystore` / object store `keys` / id `master`). The raw bytes never leave the browser, so even with DevTools the key cannot be exported.
 2. Encrypt JSON: random 12-byte IV + AES-GCM ciphertext, base64-encoded into the cookie value.
-3. Fallback (no `crypto.subtle` or no fingerprint): plain base64.
+3. Fallback (no `crypto.subtle` or no IndexedDB): plain base64.
+
+The key is stable across page loads (same browser profile = same DB = same `CryptoKey`), so cookies written on one visit always decrypt on the next. Clearing site data wipes the keystore and the cookies together, which is the intended lifecycle.
 
 Two cookie shapes:
 
@@ -87,7 +89,7 @@ Two cookie shapes:
 
 All cookies are written with a **5-year `expires`** by `writeCookie()`, refreshed on every save (rolling expiry). Note: Chromium clamps cookie lifetime to 400 days regardless.
 
-Boot sequence: `init()` → load FingerprintJS → derive key → read & decrypt cookie → apply URL `?lang` / `?theme` overrides → `I18N.setLang(...)` → `applyScreenMode(...)` → resolve `Settings.ready`. Modules typically gate first-render on `Settings.ready.then(...)` so they see the correct language and screen mode.
+Boot sequence: `init()` → open keystore IDB → load-or-generate `CryptoKey` → read & decrypt cookie → apply URL `?lang` / `?theme` overrides → `I18N.setLang(...)` → `applyScreenMode(...)` → resolve `Settings.ready`. Modules typically gate first-render on `Settings.ready.then(...)` so they see the correct language and screen mode.
 
 ### Screen mode (light/dark)
 
@@ -141,7 +143,7 @@ Each module is a single document. They share the same conventions (i18n attribut
 ## Cross-cutting conventions
 
 - **No build step for code.** A user can serve the directory with any static server. Only translation `_lang.js` files are generated, by `build_lang.sh`.
-- **External CDN deps** (loaded per-module via `<script>` tags): FingerprintJS (everywhere, for the encryption key), `qrcode-generator` (QRGenerator only). Everything else is hand-written.
+- **External CDN deps** (loaded per-module via `<script>` tags): `qrcode-generator` (QRGenerator only). Everything else is hand-written.
 - **IIFE wrapping** is used in `DayInfo.js`, `Repayment.js`, `QRGenerator.js`. New utilities should follow this to keep the global namespace clean.
 - **Test exposure** uses the `window.__UNITTEST__` flag set by `unittest.html` *before* any source file loads. A module checks this flag and either exposes pure helpers on a `_<Module>` global or runs normal init.
 - **Screen mode** support is mandatory: every module ships both `@media (prefers-color-scheme: dark)` and `[data-theme="dark"]` / `[data-theme="light"]` rules, sourcing colors from CSS variables.
@@ -153,7 +155,7 @@ A self-contained harness: hand-rolled `describe` / `it` / `expect` (`toBe`, `toE
 
 Mechanics:
 1. Sets `window.__UNITTEST__ = true` in the first inline script so source files can detect test mode.
-2. Stubs `document.getElementById` / `querySelector` to return a `fakeEl` for missing elements, and stubs `FingerprintJS` so `Settings` initializes without a real fingerprint.
+2. Stubs `document.getElementById` / `querySelector` to return a `fakeEl` for missing elements. `Settings` initializes against the real browser IndexedDB / `crypto.subtle`, so no encryption stubs are needed; if either is unavailable in the test env, `Settings` falls back to a plain-base64 path and tests still run.
 3. Loads source files in dependency order, ending with the per-module `_lang.js` and module JS.
 4. `Run Tests` button awaits `Settings.ready`, then iterates suites synchronously, recording pass/fail/elapsed.
 
