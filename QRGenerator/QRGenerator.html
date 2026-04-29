@@ -17,6 +17,21 @@
       <div class="qr-placeholder" id="qrPlaceholder" data-i18n="qr_placeholder">Enter text below</div>
     </div>
 
+    <div class="download-row" role="group" data-i18n-aria="aria_download_group" aria-label="Download QR code">
+      <span class="download-label" data-i18n="download_label">DOWNLOAD</span>
+      <div class="download-controls">
+        <div class="theme-toggle" id="downloadThemeToggle" role="radiogroup" data-i18n-aria="aria_download_theme" aria-label="Download color theme">
+          <button type="button" class="theme-btn" data-theme="light" role="radio" aria-checked="true" data-i18n="theme_light">Light</button>
+          <button type="button" class="theme-btn" data-theme="dark" role="radio" aria-checked="false" data-i18n="theme_dark">Dark</button>
+        </div>
+        <div class="download-buttons">
+          <button type="button" class="download-btn" id="downloadPngBtn" data-i18n-aria="aria_download_png" aria-label="Download as PNG" disabled>PNG</button>
+          <button type="button" class="download-btn" id="downloadJpgBtn" data-i18n-aria="aria_download_jpg" aria-label="Download as JPG" disabled>JPG</button>
+          <button type="button" class="download-btn" id="downloadSvgBtn" data-i18n-aria="aria_download_svg" aria-label="Download as SVG" disabled>SVG</button>
+        </div>
+      </div>
+    </div>
+
     <div class="input-area">
       <div class="input-header">
         <label for="qrInput" data-i18n="text_label">TEXT</label>

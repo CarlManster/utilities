@@ -513,6 +513,62 @@ describe('QRGenerator - truncateForDisplay', function() {
   });
 });
 
+describe('QRGenerator - getDownloadThemeColors', function() {
+  it('"light" → black on white', function() {
+    var c = Q.getDownloadThemeColors('light');
+    expect(c.fg).toBe('#000000');
+    expect(c.bg).toBe('#ffffff');
+  });
+  it('"dark" → white on dark gray', function() {
+    var c = Q.getDownloadThemeColors('dark');
+    expect(c.fg).toBe('#ffffff');
+    expect(c.bg).toBe('#1f1f23');
+  });
+  it('unknown value falls back to light', function() {
+    var c = Q.getDownloadThemeColors('purple');
+    expect(c.fg).toBe('#000000');
+    expect(c.bg).toBe('#ffffff');
+  });
+});
+
+describe('QRGenerator - buildSVGString', function() {
+  it('produces an SVG element with correct dimensions', function() {
+    var matrix = [[true, false], [false, true]];
+    var svg = Q.buildSVGString(matrix, '#000', '#fff', 8, 4);
+    // size = (2 + 4*2) * 8 = 80
+    expect(svg.indexOf('<svg') === 0).toBe(true);
+    expect(svg.indexOf('width="80"') > -1).toBe(true);
+    expect(svg.indexOf('height="80"') > -1).toBe(true);
+    expect(svg.indexOf('viewBox="0 0 80 80"') > -1).toBe(true);
+  });
+  it('emits one rect per dark module plus the background rect', function() {
+    var matrix = [[true, false], [false, true]];
+    var svg = Q.buildSVGString(matrix, '#000', '#fff', 8, 4);
+    var rectCount = (svg.match(/<rect /g) || []).length;
+    // 1 background + 2 dark modules = 3
+    expect(rectCount).toBe(3);
+  });
+  it('places dark modules at margin-offset coordinates', function() {
+    var matrix = [[true]];
+    var svg = Q.buildSVGString(matrix, '#000', '#fff', 8, 4);
+    // module (0,0) → x=4*8=32, y=32
+    expect(svg.indexOf('x="32" y="32" width="8" height="8"') > -1).toBe(true);
+  });
+  it('uses the supplied fg/bg colors', function() {
+    var matrix = [[true]];
+    var svg = Q.buildSVGString(matrix, '#abcdef', '#123456', 8, 4);
+    expect(svg.indexOf('fill="#123456"') > -1).toBe(true);
+    expect(svg.indexOf('fill="#abcdef"') > -1).toBe(true);
+  });
+  it('produces no module rects for an all-light matrix', function() {
+    var matrix = [[false, false], [false, false]];
+    var svg = Q.buildSVGString(matrix, '#000', '#fff', 8, 4);
+    var rectCount = (svg.match(/<rect /g) || []).length;
+    // background rect only
+    expect(rectCount).toBe(1);
+  });
+});
+
 describe('QRGenerator - computeAddRecent', function() {
   it('adds new item to front', function() {
     var out = Q.computeAddRecent([], 'hello', '2026-04-13T00:00:00Z', 5);

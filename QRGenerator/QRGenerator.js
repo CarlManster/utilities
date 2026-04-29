@@ -43,10 +43,38 @@ function computeAddRecent(list, text, date, max) {
   return filtered.slice(0, max);
 }
 
+// Fixed theme colors for downloaded images, independent of the live preview.
+const DOWNLOAD_THEMES = {
+  light: { fg: '#000000', bg: '#ffffff' },
+  dark:  { fg: '#ffffff', bg: '#1f1f23' },
+};
+
+function getDownloadThemeColors(theme) {
+  return DOWNLOAD_THEMES[theme] || DOWNLOAD_THEMES.light;
+}
+
+// Pure SVG builder from a 2D boolean matrix of QR modules.
+function buildSVGString(matrix, fg, bg, cellSize, margin) {
+  const moduleCount = matrix.length;
+  const size = (moduleCount + margin * 2) * cellSize;
+  let rects = '';
+  for (let r = 0; r < moduleCount; r++) {
+    for (let c = 0; c < moduleCount; c++) {
+      if (matrix[r][c]) {
+        const x = (c + margin) * cellSize;
+        const y = (r + margin) * cellSize;
+        rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}"/>`;
+      }
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="${bg}"/><g fill="${fg}">${rects}</g></svg>`;
+}
+
 // === Expose for unit tests, then bail out before touching DOM ===
 if (typeof window !== 'undefined' && window.__UNITTEST__) {
   window._QRGenerator = {
-    detectMode, pad2, formatDate, truncateForDisplay, computeAddRecent,
+    detectMode, pad2, formatDate, truncateForDisplay, computeAddRecent, buildSVGString,
+    getDownloadThemeColors, DOWNLOAD_THEMES,
     MODE_LIMITS, MAX_RECENT, RECENT_DISPLAY_MAX,
   };
   return;
@@ -61,8 +89,14 @@ const charCount = document.getElementById('charCount');
 const recentListEl = document.getElementById('recentList');
 const saveBtn = document.getElementById('saveBtn');
 const srStatus = document.getElementById('srStatus');
+const downloadPngBtn = document.getElementById('downloadPngBtn');
+const downloadJpgBtn = document.getElementById('downloadJpgBtn');
+const downloadSvgBtn = document.getElementById('downloadSvgBtn');
+const themeToggle = document.getElementById('downloadThemeToggle');
+const themeBtns = themeToggle ? themeToggle.querySelectorAll('.theme-btn') : [];
 
 let recent = [];
+let currentQR = null;
 
 function announce(msg) {
   if (!srStatus) return;
@@ -81,6 +115,13 @@ function updateCharCount() {
 
 function updateSaveBtn() {
   saveBtn.disabled = !input.value.trim() || !!errorEl.textContent;
+}
+
+function updateDownloadBtns() {
+  const enabled = !!currentQR;
+  downloadPngBtn.disabled = !enabled;
+  downloadJpgBtn.disabled = !enabled;
+  downloadSvgBtn.disabled = !enabled;
 }
 
 function resolveTheme() {
@@ -116,11 +157,13 @@ function setQRAreaLabel(text) {
 function render() {
   const text = input.value;
   clearCanvases();
+  currentQR = null;
 
   if (!text) {
     placeholder.hidden = false;
     errorEl.textContent = '';
     setQRAreaLabel('');
+    updateDownloadBtns();
     return;
   }
 
@@ -128,6 +171,7 @@ function render() {
     placeholder.hidden = false;
     errorEl.textContent = I18N.t('error_lib', 'Failed to load the QR library.');
     setQRAreaLabel('');
+    updateDownloadBtns();
     return;
   }
 
@@ -151,23 +195,102 @@ function render() {
     ctx.fillStyle = colors.bg;
     ctx.fillRect(0, 0, size, size);
     ctx.fillStyle = colors.fg;
+    const matrix = [];
     for (let r = 0; r < moduleCount; r++) {
+      const row = [];
       for (let c = 0; c < moduleCount; c++) {
-        if (qr.isDark(r, c)) {
+        const dark = qr.isDark(r, c);
+        row.push(dark);
+        if (dark) {
           ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
         }
       }
+      matrix.push(row);
     }
 
     qrArea.appendChild(canvas);
     placeholder.hidden = true;
     errorEl.textContent = '';
     setQRAreaLabel(text);
+    currentQR = { canvas, matrix, colors, cellSize, margin };
   } catch (e) {
     placeholder.hidden = false;
     errorEl.textContent = I18N.t('error_generate', 'Could not generate QR code: ') + e.message;
     setQRAreaLabel('');
   }
+  updateDownloadBtns();
+}
+
+function triggerDownload(href, filename) {
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function buildFilename(ext) {
+  const text = (input.value || '').trim();
+  const slug = text
+    .replace(/[\s ]+/g, '-')
+    .replace(/[^A-Za-z0-9._-]/g, '')
+    .slice(0, 32);
+  return `qrcode${slug ? '-' + slug : ''}.${ext}`;
+}
+
+function getSelectedDownloadTheme() {
+  for (const btn of themeBtns) {
+    if (btn.getAttribute('aria-checked') === 'true') return btn.dataset.theme;
+  }
+  return 'light';
+}
+
+function renderMatrixToCanvas(matrix, colors, cellSize, margin) {
+  const moduleCount = matrix.length;
+  const size = (moduleCount + margin * 2) * cellSize;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = colors.fg;
+  for (let r = 0; r < moduleCount; r++) {
+    for (let c = 0; c < moduleCount; c++) {
+      if (matrix[r][c]) {
+        ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+  return canvas;
+}
+
+function downloadRaster(mime, ext) {
+  if (!currentQR) return;
+  const colors = getDownloadThemeColors(getSelectedDownloadTheme());
+  const canvas = renderMatrixToCanvas(currentQR.matrix, colors, currentQR.cellSize, currentQR.margin);
+  const url = canvas.toDataURL(mime, mime === 'image/jpeg' ? 0.95 : undefined);
+  triggerDownload(url, buildFilename(ext));
+}
+
+function downloadSVG() {
+  if (!currentQR) return;
+  const { matrix, cellSize, margin } = currentQR;
+  const colors = getDownloadThemeColors(getSelectedDownloadTheme());
+  const svg = buildSVGString(matrix, colors.fg, colors.bg, cellSize, margin);
+  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  triggerDownload(url, buildFilename('svg'));
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function setDownloadTheme(theme) {
+  themeBtns.forEach(btn => {
+    const active = btn.dataset.theme === theme;
+    btn.setAttribute('aria-checked', active ? 'true' : 'false');
+    btn.classList.toggle('active', active);
+  });
 }
 
 function loadRecentItem(item) {
@@ -268,6 +391,16 @@ saveBtn.addEventListener('click', () => {
   if (saveBtn.disabled) return;
   addRecent(input.value);
 });
+
+downloadPngBtn.addEventListener('click', () => downloadRaster('image/png', 'png'));
+downloadJpgBtn.addEventListener('click', () => downloadRaster('image/jpeg', 'jpg'));
+downloadSvgBtn.addEventListener('click', downloadSVG);
+
+themeBtns.forEach(btn => {
+  btn.addEventListener('click', () => setDownloadTheme(btn.dataset.theme));
+});
+
+setDownloadTheme(resolveTheme());
 
 // Re-render when theme changes (system preference or data-theme attribute).
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
