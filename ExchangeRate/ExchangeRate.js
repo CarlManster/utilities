@@ -25,8 +25,24 @@ function convert(amount, rate, reversed) {
   return reversed ? amount / rate : amount * rate;
 }
 
+var SORT_COLS = ['code', 'name', 'amount'];
+var SORT_DIRS = ['asc', 'desc'];
+
+function compareRows(a, b, col, dir) {
+  var sign = dir === 'asc' ? 1 : -1;
+  if (col === 'amount') return (a.value - b.value) * sign;
+  if (col === 'name')   return a.name.localeCompare(b.name) * sign;
+  return a.code.localeCompare(b.code) * sign;
+}
+
 if (window.__UNITTEST__) {
-  window._ExchangeRate = { formatValue: formatValue, matchesCurrencyFilter: matchesCurrencyFilter, convert: convert, DEFAULT_AMOUNT: DEFAULT_AMOUNT };
+  window._ExchangeRate = {
+    formatValue: formatValue,
+    matchesCurrencyFilter: matchesCurrencyFilter,
+    convert: convert,
+    compareRows: compareRows,
+    DEFAULT_AMOUNT: DEFAULT_AMOUNT
+  };
   return;
 }
 
@@ -35,6 +51,8 @@ if (window.__UNITTEST__) {
 var currencyList = {};
 var rates = {};
 var reversed = false;
+var sortCol = 'code';
+var sortDir = 'asc';
 
 // ── DOM references ───────────────────────────────────────────────────────────
 
@@ -52,15 +70,22 @@ function renderTable() {
   var amount = parseFloat(amountInput.value);
   if (!isFinite(amount) || amount <= 0) amount = DEFAULT_AMOUNT;
 
-  var entries = Object.keys(currencyList)
+  var rows = Object.keys(currencyList)
     .filter(function (code) {
       return rates[code] !== undefined && matchesCurrencyFilter(code, currencyList[code], filter);
     })
-    .sort(function (a, b) { return a.localeCompare(b); });
+    .map(function (code) {
+      return {
+        code: code,
+        name: currencyList[code],
+        value: convert(amount, rates[code], reversed)
+      };
+    })
+    .sort(function (a, b) { return compareRows(a, b, sortCol, sortDir); });
 
   tableBody.textContent = '';
 
-  if (entries.length === 0) {
+  if (rows.length === 0) {
     var tr = document.createElement('tr');
     var td = document.createElement('td');
     td.colSpan = 3;
@@ -72,21 +97,20 @@ function renderTable() {
   }
 
   var fragment = document.createDocumentFragment();
-  entries.forEach(function (code) {
-    var value = convert(amount, rates[code], reversed);
+  rows.forEach(function (row) {
     var tr = document.createElement('tr');
 
     var tdCode = document.createElement('td');
     tdCode.className = 'col-code';
-    tdCode.textContent = code.toUpperCase();
+    tdCode.textContent = row.code.toUpperCase();
 
     var tdName = document.createElement('td');
     tdName.className = 'col-name';
-    tdName.textContent = currencyList[code];
+    tdName.textContent = row.name;
 
     var tdVal = document.createElement('td');
     tdVal.className = 'col-amount';
-    tdVal.textContent = formatValue(value);
+    tdVal.textContent = formatValue(row.value);
 
     tr.appendChild(tdCode);
     tr.appendChild(tdName);
@@ -131,6 +155,53 @@ function loadData() {
   });
 }
 
+// ── Sort headers ─────────────────────────────────────────────────────────────
+
+var sortableHeaders = document.querySelectorAll('th[data-sort]');
+
+function applySortIndicator() {
+  for (var i = 0; i < sortableHeaders.length; i++) {
+    var th = sortableHeaders[i];
+    var col = th.getAttribute('data-sort');
+    if (col === sortCol) {
+      th.setAttribute('aria-sort', sortDir === 'asc' ? 'ascending' : 'descending');
+    } else {
+      th.setAttribute('aria-sort', 'none');
+    }
+  }
+}
+
+function persistSort() {
+  Settings.set('exchangeRate', { sortCol: sortCol, sortDir: sortDir, reversed: reversed });
+}
+
+function setSort(col) {
+  if (SORT_COLS.indexOf(col) === -1) return;
+  if (col === sortCol) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  applySortIndicator();
+  persistSort();
+  renderTable();
+}
+
+for (var i = 0; i < sortableHeaders.length; i++) {
+  (function (th) {
+    th.addEventListener('click', function () {
+      setSort(th.getAttribute('data-sort'));
+    });
+    th.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        setSort(th.getAttribute('data-sort'));
+      }
+    });
+  })(sortableHeaders[i]);
+}
+
 // ── Direction toggle ─────────────────────────────────────────────────────────
 
 function updateUnitLabel() {
@@ -143,6 +214,7 @@ reverseBtn.addEventListener('click', function () {
   reversed = !reversed;
   this.setAttribute('aria-pressed', String(reversed));
   updateUnitLabel();
+  persistSort();
   renderTable();
 });
 
@@ -154,6 +226,17 @@ searchInput.addEventListener('input', renderTable);
 // ── Boot ─────────────────────────────────────────────────────────────────────
 
 Settings.ready.then(function () {
+  var saved = Settings.get('exchangeRate');
+  if (saved) {
+    if (SORT_COLS.indexOf(saved.sortCol) !== -1) sortCol = saved.sortCol;
+    if (SORT_DIRS.indexOf(saved.sortDir) !== -1) sortDir = saved.sortDir;
+    if (saved.reversed === true) {
+      reversed = true;
+      reverseBtn.setAttribute('aria-pressed', 'true');
+      updateUnitLabel();
+    }
+  }
+  applySortIndicator();
   loadData();
 });
 
