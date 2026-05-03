@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exchange Rate Calculator</title>
+<link rel="stylesheet" href="ExchangeRate.css">
+</head>
+<body>
+
+<main class="container" data-i18n-aria="aria_main" aria-label="Exchange rate calculator">
+  <h1 data-i18n="title">Exchange Rate Calculator</h1>
+  <p class="subtitle" data-i18n="subtitle">Convert an amount to all world currencies</p>
+
+  <div class="controls">
+    <div class="field-group amount-group">
+      <label class="field-label" for="amountInput" data-i18n="label_amount">AMOUNT</label>
+      <div class="amount-row">
+        <input
+          type="number"
+          id="amountInput"
+          value="10000"
+          min="1"
+          step="1"
+          data-i18n-aria="aria_amount"
+          aria-label="Amount in KRW to convert"
+        >
+        <span class="currency-unit" data-i18n="currency_unit">KRW</span>
+      </div>
+    </div>
+
+    <div class="field-group search-group">
+      <label class="field-label" for="searchInput" data-i18n="label_search">SEARCH</label>
+      <input
+        type="text"
+        id="searchInput"
+        data-i18n-placeholder="placeholder_search"
+        placeholder="Search by code or name (USD, Dollar...)"
+        data-i18n-aria="aria_search"
+        aria-label="Filter currencies by code or name"
+        autocomplete="off"
+        spellcheck="false"
+      >
+    </div>
+  </div>
+
+  <p
+    id="statusText"
+    class="status"
+    role="status"
+    aria-live="polite"
+    data-i18n-aria="aria_status"
+    aria-label="Loading status"
+  ></p>
+
+  <div class="table-wrapper">
+    <table data-i18n-aria="aria_table" aria-label="Exchange rate results">
+      <thead>
+        <tr>
+          <th scope="col" data-i18n="col_code">Code</th>
+          <th scope="col" data-i18n="col_name">Currency</th>
+          <th scope="col" class="col-amount" data-i18n="col_amount">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="exchangeTable"></tbody>
+    </table>
+  </div>
+</main>
+
+<script src="../i18n.js"></script>
+<script src="ExchangeRate_lang.js"></script>
+<script src="../settings.js"></script>
+<script src="ExchangeRate.js"></script>
+
+</body>
+</html>

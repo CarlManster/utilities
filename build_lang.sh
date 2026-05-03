@@ -15,7 +15,8 @@ var pages = [
   { dir: 'JSONVisualizer', name: 'JSONVisualizer' },
   { dir: 'DayInfo', name: 'DayInfo' },
   { dir: 'Repayment', name: 'Repayment' },
-  { dir: 'QRGenerator', name: 'QRGenerator' }
+  { dir: 'QRGenerator', name: 'QRGenerator' },
+  { dir: 'ExchangeRate', name: 'ExchangeRate' }
 ];
 
 var langs = ['en', 'ko', 'jp'];

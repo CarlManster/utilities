@@ -1,0 +1,20 @@
+{
+  "title": "환율 계산기",
+  "subtitle": "원화 금액을 전 세계 통화로 환산합니다",
+  "label_amount": "금액",
+  "currency_unit": "원",
+  "label_search": "검색",
+  "placeholder_search": "코드 또는 통화명 검색 (USD, Dollar...)",
+  "col_code": "통화 코드",
+  "col_name": "통화명",
+  "col_amount": "금액",
+  "loading": "로딩 중...",
+  "error_load": "환율 데이터를 불러오지 못했습니다.",
+  "date_prefix": "기준 날짜: ",
+  "no_results": "검색 결과가 없습니다.",
+  "aria_main": "환율 계산기",
+  "aria_amount": "환산할 원화 금액",
+  "aria_search": "통화 코드 또는 이름으로 검색",
+  "aria_table": "환율 결과 표",
+  "aria_status": "로딩 상태"
+}

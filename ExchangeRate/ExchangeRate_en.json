@@ -1,0 +1,20 @@
+{
+  "title": "Exchange Rate Calculator",
+  "subtitle": "Convert an amount to all world currencies",
+  "label_amount": "AMOUNT",
+  "currency_unit": "KRW",
+  "label_search": "SEARCH",
+  "placeholder_search": "Search by code or name (USD, Dollar...)",
+  "col_code": "Code",
+  "col_name": "Currency",
+  "col_amount": "Amount",
+  "loading": "Loading...",
+  "error_load": "Failed to load exchange rate data.",
+  "date_prefix": "Reference date: ",
+  "no_results": "No currencies match your search.",
+  "aria_main": "Exchange rate calculator",
+  "aria_amount": "Amount in KRW to convert",
+  "aria_search": "Filter currencies by code or name",
+  "aria_table": "Exchange rate results",
+  "aria_status": "Loading status"
+}

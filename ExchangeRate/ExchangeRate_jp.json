@@ -1,0 +1,20 @@
+{
+  "title": "為替レート計算機",
+  "subtitle": "ウォン建ての金額を世界中の通貨に換算します",
+  "label_amount": "金額",
+  "currency_unit": "ウォン",
+  "label_search": "検索",
+  "placeholder_search": "コードまたは通貨名で検索 (USD, Dollar...)",
+  "col_code": "通貨コード",
+  "col_name": "通貨名",
+  "col_amount": "金額",
+  "loading": "読み込み中...",
+  "error_load": "為替レートデータを読み込めませんでした。",
+  "date_prefix": "基準日: ",
+  "no_results": "検索結果がありません。",
+  "aria_main": "為替レート計算機",
+  "aria_amount": "換算するウォンの金額",
+  "aria_search": "通貨コードまたは名前で絞り込む",
+  "aria_table": "為替レート結果テーブル",
+  "aria_status": "読み込み状態"
+}
