@@ -67,6 +67,10 @@ nav .nav-link.active {
   color: var(--nav-active);
   background: var(--nav-active-bg);
 }
+/* Brighten the Exchange Rate emoji which renders darker than others */
+nav .nav-link[data-src^="ExchangeRate"] {
+  filter: brightness(1.35) saturate(1.2);
+}
 /* ─── Settings button ─── */
 .settings-btn {
   margin-left: auto;
