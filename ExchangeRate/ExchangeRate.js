@@ -207,7 +207,7 @@ for (var i = 0; i < sortableHeaders.length; i++) {
 function updateUnitLabel() {
   var key = reversed ? 'unit_reversed' : 'currency_unit';
   unitLabelEl.setAttribute('data-i18n', key);
-  unitLabelEl.textContent = I18N.t(key, reversed ? 'each → KRW' : 'KRW');
+  unitLabelEl.textContent = I18N.t(key, reversed ? 'each → KRW' : 'KRW → each');
 }
 
 reverseBtn.addEventListener('click', function () {

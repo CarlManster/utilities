@@ -2,7 +2,7 @@
   "title": "Exchange Rate Calculator",
   "subtitle": "Convert an amount to all world currencies",
   "label_amount": "AMOUNT",
-  "currency_unit": "KRW",
+  "currency_unit": "KRW → each",
   "unit_reversed": "each → KRW",
   "label_search": "SEARCH",
   "placeholder_search": "Search by code or name (USD, Dollar...)",

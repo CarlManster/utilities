@@ -2,7 +2,7 @@
   "title": "為替レート計算機",
   "subtitle": "ウォン建ての金額を世界中の通貨に換算します",
   "label_amount": "金額",
-  "currency_unit": "ウォン",
+  "currency_unit": "ウォン → 各通貨",
   "unit_reversed": "各通貨 → ウォン",
   "label_search": "検索",
   "placeholder_search": "コードまたは通貨名で検索 (USD, Dollar...)",

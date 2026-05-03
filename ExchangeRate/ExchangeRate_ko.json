@@ -2,7 +2,7 @@
   "title": "환율 계산기",
   "subtitle": "원화 금액을 전 세계 통화로 환산합니다",
   "label_amount": "금액",
-  "currency_unit": "원",
+  "currency_unit": "원 → 각 화폐",
   "unit_reversed": "각 화폐 → 원",
   "label_search": "검색",
   "placeholder_search": "코드 또는 통화명 검색 (USD, Dollar...)",
