@@ -69,7 +69,17 @@ nav .nav-link.active {
 }
 /* Brighten the Exchange Rate emoji which renders darker than others */
 nav .nav-link[data-src^="ExchangeRate"] {
-  filter: brightness(1.35) saturate(1.2);
+  font-size: 0;
+}
+nav .nav-link[data-src^="ExchangeRate"]::before {
+  content: "\1F4B1";
+  font-size: 1.25rem;
+  filter: grayscale(1) brightness(1.7);
+  transition: filter 0.2s;
+}
+nav .nav-link[data-src^="ExchangeRate"]:hover::before,
+nav .nav-link[data-src^="ExchangeRate"].active::before {
+  filter: grayscale(1) brightness(3.7);
 }
 /* ─── Settings button ─── */
 .settings-btn {
