@@ -3,6 +3,7 @@
   "subtitle": "원화 금액을 전 세계 통화로 환산합니다",
   "label_amount": "금액",
   "currency_unit": "원",
+  "unit_reversed": "각 화폐 → 원",
   "label_search": "검색",
   "placeholder_search": "코드 또는 통화명 검색 (USD, Dollar...)",
   "col_code": "통화 코드",
@@ -16,5 +17,6 @@
   "aria_amount": "환산할 원화 금액",
   "aria_search": "통화 코드 또는 이름으로 검색",
   "aria_table": "환율 결과 표",
-  "aria_status": "로딩 상태"
+  "aria_status": "로딩 상태",
+  "aria_toggle": "환산 방향 전환"
 }

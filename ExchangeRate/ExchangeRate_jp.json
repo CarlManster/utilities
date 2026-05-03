@@ -3,6 +3,7 @@
   "subtitle": "ウォン建ての金額を世界中の通貨に換算します",
   "label_amount": "金額",
   "currency_unit": "ウォン",
+  "unit_reversed": "各通貨 → ウォン",
   "label_search": "検索",
   "placeholder_search": "コードまたは通貨名で検索 (USD, Dollar...)",
   "col_code": "通貨コード",
@@ -16,5 +17,6 @@
   "aria_amount": "換算するウォンの金額",
   "aria_search": "通貨コードまたは名前で絞り込む",
   "aria_table": "為替レート結果テーブル",
-  "aria_status": "読み込み状態"
+  "aria_status": "読み込み状態",
+  "aria_toggle": "換算方向の切替"
 }

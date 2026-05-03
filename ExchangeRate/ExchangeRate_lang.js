@@ -4,6 +4,7 @@ I18N.register({
     "subtitle": "Convert an amount to all world currencies",
     "label_amount": "AMOUNT",
     "currency_unit": "KRW",
+    "unit_reversed": "each → KRW",
     "label_search": "SEARCH",
     "placeholder_search": "Search by code or name (USD, Dollar...)",
     "col_code": "Code",
@@ -17,13 +18,15 @@ I18N.register({
     "aria_amount": "Amount in KRW to convert",
     "aria_search": "Filter currencies by code or name",
     "aria_table": "Exchange rate results",
-    "aria_status": "Loading status"
+    "aria_status": "Loading status",
+    "aria_toggle": "Reverse conversion direction"
   },
   "ko": {
     "title": "환율 계산기",
     "subtitle": "원화 금액을 전 세계 통화로 환산합니다",
     "label_amount": "금액",
     "currency_unit": "원",
+    "unit_reversed": "각 화폐 → 원",
     "label_search": "검색",
     "placeholder_search": "코드 또는 통화명 검색 (USD, Dollar...)",
     "col_code": "통화 코드",
@@ -37,13 +40,15 @@ I18N.register({
     "aria_amount": "환산할 원화 금액",
     "aria_search": "통화 코드 또는 이름으로 검색",
     "aria_table": "환율 결과 표",
-    "aria_status": "로딩 상태"
+    "aria_status": "로딩 상태",
+    "aria_toggle": "환산 방향 전환"
   },
   "jp": {
     "title": "為替レート計算機",
     "subtitle": "ウォン建ての金額を世界中の通貨に換算します",
     "label_amount": "金額",
     "currency_unit": "ウォン",
+    "unit_reversed": "各通貨 → ウォン",
     "label_search": "検索",
     "placeholder_search": "コードまたは通貨名で検索 (USD, Dollar...)",
     "col_code": "通貨コード",
@@ -57,6 +62,7 @@ I18N.register({
     "aria_amount": "換算するウォンの金額",
     "aria_search": "通貨コードまたは名前で絞り込む",
     "aria_table": "為替レート結果テーブル",
-    "aria_status": "読み込み状態"
+    "aria_status": "読み込み状態",
+    "aria_toggle": "換算方向の切替"
   }
 });

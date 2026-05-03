@@ -44,14 +44,26 @@
     </div>
   </div>
 
-  <p
-    id="statusText"
-    class="status"
-    role="status"
-    aria-live="polite"
-    data-i18n-aria="aria_status"
-    aria-label="Loading status"
-  ></p>
+  <div class="status-row">
+    <p
+      id="statusText"
+      class="status"
+      role="status"
+      aria-live="polite"
+      data-i18n-aria="aria_status"
+      aria-label="Loading status"
+    ></p>
+    <button
+      type="button"
+      id="reverseToggle"
+      class="toggle-btn"
+      aria-pressed="false"
+      data-i18n-aria="aria_toggle"
+      aria-label="Reverse conversion direction"
+      title="Reverse conversion direction"
+      data-i18n-title="aria_toggle"
+    >&#x21C4;</button>
+  </div>
 
   <div class="table-wrapper">
     <table data-i18n-aria="aria_table" aria-label="Exchange rate results">

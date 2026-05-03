@@ -3,6 +3,7 @@
   "subtitle": "Convert an amount to all world currencies",
   "label_amount": "AMOUNT",
   "currency_unit": "KRW",
+  "unit_reversed": "each → KRW",
   "label_search": "SEARCH",
   "placeholder_search": "Search by code or name (USD, Dollar...)",
   "col_code": "Code",
@@ -16,5 +17,6 @@
   "aria_amount": "Amount in KRW to convert",
   "aria_search": "Filter currencies by code or name",
   "aria_table": "Exchange rate results",
-  "aria_status": "Loading status"
+  "aria_status": "Loading status",
+  "aria_toggle": "Reverse conversion direction"
 }

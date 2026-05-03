@@ -21,8 +21,12 @@ function matchesCurrencyFilter(code, name, filter) {
 
 // ── Unit-test mode: expose helpers and bail ──────────────────────────────────
 
+function convert(amount, rate, reversed) {
+  return reversed ? amount / rate : amount * rate;
+}
+
 if (window.__UNITTEST__) {
-  window._ExchangeRate = { formatValue: formatValue, matchesCurrencyFilter: matchesCurrencyFilter, DEFAULT_AMOUNT: DEFAULT_AMOUNT };
+  window._ExchangeRate = { formatValue: formatValue, matchesCurrencyFilter: matchesCurrencyFilter, convert: convert, DEFAULT_AMOUNT: DEFAULT_AMOUNT };
   return;
 }
 
@@ -30,13 +34,16 @@ if (window.__UNITTEST__) {
 
 var currencyList = {};
 var rates = {};
+var reversed = false;
 
 // ── DOM references ───────────────────────────────────────────────────────────
 
-var amountInput  = document.getElementById('amountInput');
-var searchInput  = document.getElementById('searchInput');
-var statusEl     = document.getElementById('statusText');
-var tableBody    = document.getElementById('exchangeTable');
+var amountInput   = document.getElementById('amountInput');
+var searchInput   = document.getElementById('searchInput');
+var statusEl      = document.getElementById('statusText');
+var tableBody     = document.getElementById('exchangeTable');
+var reverseBtn    = document.getElementById('reverseToggle');
+var unitLabelEl   = document.querySelector('.currency-unit');
 
 // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -66,7 +73,7 @@ function renderTable() {
 
   var fragment = document.createDocumentFragment();
   entries.forEach(function (code) {
-    var value = amount * rates[code];
+    var value = convert(amount, rates[code], reversed);
     var tr = document.createElement('tr');
 
     var tdCode = document.createElement('td');
@@ -123,6 +130,21 @@ function loadData() {
     console.error(err);
   });
 }
+
+// ── Direction toggle ─────────────────────────────────────────────────────────
+
+function updateUnitLabel() {
+  var key = reversed ? 'unit_reversed' : 'currency_unit';
+  unitLabelEl.setAttribute('data-i18n', key);
+  unitLabelEl.textContent = I18N.t(key, reversed ? 'each → KRW' : 'KRW');
+}
+
+reverseBtn.addEventListener('click', function () {
+  reversed = !reversed;
+  this.setAttribute('aria-pressed', String(reversed));
+  updateUnitLabel();
+  renderTable();
+});
 
 // ── Event listeners ──────────────────────────────────────────────────────────
 
