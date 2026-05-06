@@ -16,7 +16,8 @@ var pages = [
   { dir: 'DayInfo', name: 'DayInfo' },
   { dir: 'Repayment', name: 'Repayment' },
   { dir: 'QRGenerator', name: 'QRGenerator' },
-  { dir: 'ExchangeRate', name: 'ExchangeRate' }
+  { dir: 'ExchangeRate', name: 'ExchangeRate' },
+  { dir: 'FolderImageSlideShow', name: 'FolderImageSlideShow' }
 ];
 
 var langs = ['en', 'ko', 'jp'];

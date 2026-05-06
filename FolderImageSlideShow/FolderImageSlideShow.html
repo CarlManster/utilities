@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folder Image Slideshow</title>
+<link rel="stylesheet" href="FolderImageSlideShow.css">
+</head>
+<body>
+
+<main class="container" data-i18n-aria="aria_main" aria-label="Folder image slideshow">
+  <h1 data-i18n="title">Folder Image Slideshow</h1>
+  <p class="subtitle" data-i18n="subtitle">Pick a folder and play its images as a slideshow</p>
+
+  <div class="controls">
+    <button type="button" id="selectFolder" class="primary-btn" data-i18n="btn_select_folder" data-i18n-aria="aria_select_folder" aria-label="Select folder">Select Folder</button>
+
+    <div class="interval-control">
+      <label for="intervalRange" class="field-label" data-i18n="label_interval">INTERVAL</label>
+      <div class="interval-row">
+        <input
+          type="range"
+          id="intervalRange"
+          min="1"
+          max="10"
+          step="0.5"
+          value="2"
+          data-i18n-aria="aria_interval"
+          aria-label="Slideshow interval in seconds"
+        >
+        <span id="intervalValue" class="interval-value" aria-live="polite">2.0s</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="viewer-area">
+    <div class="empty-state" id="emptyState" role="status" aria-live="polite">
+      <div class="empty-icon" aria-hidden="true">&#x1F4C1;</div>
+      <p class="empty-text" id="emptyTextNoFolder" data-i18n="empty_no_folder">Select a folder to begin the slideshow.</p>
+      <p class="empty-text" id="emptyTextNoImages" data-i18n="empty_no_images" hidden>No image files were found in the selected folder. Pick another folder.</p>
+      <p class="empty-text empty-error" id="emptyTextUnsupported" data-i18n="empty_unsupported" hidden>This browser does not support folder selection. Try a recent Chromium-based browser.</p>
+    </div>
+
+    <figure class="slide" id="slide" hidden>
+      <img id="viewer" alt="">
+      <figcaption id="caption" class="caption"></figcaption>
+    </figure>
+  </div>
+</main>
+
+<script src="../i18n.js"></script>
+<script src="FolderImageSlideShow_lang.js"></script>
+<script src="../settings.js"></script>
+<script src="FolderImageSlideShow.js"></script>
+
+</body>
+</html>

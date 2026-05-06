@@ -1,0 +1,12 @@
+{
+  "title": "Folder Image Slideshow",
+  "subtitle": "Pick a folder and play its images as a slideshow",
+  "btn_select_folder": "Select Folder",
+  "label_interval": "INTERVAL",
+  "empty_no_folder": "Select a folder to begin the slideshow.",
+  "empty_no_images": "No image files were found in the selected folder. Pick another folder.",
+  "empty_unsupported": "This browser does not support folder selection. Try a recent Chromium-based browser.",
+  "aria_main": "Folder image slideshow",
+  "aria_select_folder": "Select folder",
+  "aria_interval": "Slideshow interval in seconds"
+}

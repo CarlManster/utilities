@@ -1,0 +1,38 @@
+I18N.register({
+  "en": {
+    "title": "Folder Image Slideshow",
+    "subtitle": "Pick a folder and play its images as a slideshow",
+    "btn_select_folder": "Select Folder",
+    "label_interval": "INTERVAL",
+    "empty_no_folder": "Select a folder to begin the slideshow.",
+    "empty_no_images": "No image files were found in the selected folder. Pick another folder.",
+    "empty_unsupported": "This browser does not support folder selection. Try a recent Chromium-based browser.",
+    "aria_main": "Folder image slideshow",
+    "aria_select_folder": "Select folder",
+    "aria_interval": "Slideshow interval in seconds"
+  },
+  "ko": {
+    "title": "폴더 이미지 슬라이드쇼",
+    "subtitle": "폴더를 선택하면 그 안의 이미지를 슬라이드쇼로 재생합니다",
+    "btn_select_folder": "폴더 선택",
+    "label_interval": "간격",
+    "empty_no_folder": "슬라이드쇼를 시작하려면 폴더를 선택해 주세요.",
+    "empty_no_images": "선택한 폴더에 이미지 파일이 없습니다. 다른 폴더를 선택해 주세요.",
+    "empty_unsupported": "이 브라우저는 폴더 선택 기능을 지원하지 않습니다. 최신 Chromium 계열 브라우저에서 시도해 주세요.",
+    "aria_main": "폴더 이미지 슬라이드쇼",
+    "aria_select_folder": "폴더 선택",
+    "aria_interval": "슬라이드쇼 간격(초)"
+  },
+  "jp": {
+    "title": "フォルダ画像スライドショー",
+    "subtitle": "フォルダを選ぶと、その中の画像をスライドショー再生します",
+    "btn_select_folder": "フォルダを選択",
+    "label_interval": "間隔",
+    "empty_no_folder": "スライドショーを開始するにはフォルダを選択してください。",
+    "empty_no_images": "選択したフォルダに画像ファイルがありません。別のフォルダを選択してください。",
+    "empty_unsupported": "このブラウザはフォルダ選択に対応していません。最新の Chromium 系ブラウザでお試しください。",
+    "aria_main": "フォルダ画像スライドショー",
+    "aria_select_folder": "フォルダを選択",
+    "aria_interval": "スライドショーの間隔(秒)"
+  }
+});
