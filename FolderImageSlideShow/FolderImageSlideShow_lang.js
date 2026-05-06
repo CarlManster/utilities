@@ -3,6 +3,9 @@ I18N.register({
     "title": "Folder Image Slideshow",
     "subtitle": "Pick a folder and play its images as a slideshow",
     "btn_select_folder": "Select Folder",
+    "btn_pause": "Pause",
+    "btn_resume": "Resume",
+    "btn_reload": "Reload",
     "label_interval": "INTERVAL",
     "empty_no_folder": "Select a folder to begin the slideshow.",
     "empty_loading": "Loading images...",
@@ -11,12 +14,17 @@ I18N.register({
     "folder_count": "{n} images",
     "aria_main": "Folder image slideshow",
     "aria_select_folder": "Select folder",
-    "aria_interval": "Slideshow interval in seconds"
+    "aria_interval": "Slideshow interval in seconds",
+    "aria_pause": "Pause or resume the slideshow",
+    "aria_reload": "Reload images from the current folder"
   },
   "ko": {
     "title": "폴더 이미지 슬라이드쇼",
     "subtitle": "폴더를 선택하면 그 안의 이미지를 슬라이드쇼로 재생합니다",
     "btn_select_folder": "폴더 선택",
+    "btn_pause": "일시정지",
+    "btn_resume": "재생",
+    "btn_reload": "다시 불러오기",
     "label_interval": "간격",
     "empty_no_folder": "슬라이드쇼를 시작하려면 폴더를 선택해 주세요.",
     "empty_loading": "이미지를 불러오는 중...",
@@ -25,12 +33,17 @@ I18N.register({
     "folder_count": "이미지 {n}개",
     "aria_main": "폴더 이미지 슬라이드쇼",
     "aria_select_folder": "폴더 선택",
-    "aria_interval": "슬라이드쇼 간격(초)"
+    "aria_interval": "슬라이드쇼 간격(초)",
+    "aria_pause": "슬라이드쇼 일시정지/재생",
+    "aria_reload": "현재 폴더에서 이미지 다시 불러오기"
   },
   "jp": {
     "title": "フォルダ画像スライドショー",
     "subtitle": "フォルダを選ぶと、その中の画像をスライドショー再生します",
     "btn_select_folder": "フォルダを選択",
+    "btn_pause": "一時停止",
+    "btn_resume": "再生",
+    "btn_reload": "再読み込み",
     "label_interval": "間隔",
     "empty_no_folder": "スライドショーを開始するにはフォルダを選択してください。",
     "empty_loading": "画像を読み込み中...",
@@ -39,6 +52,8 @@ I18N.register({
     "folder_count": "画像 {n}枚",
     "aria_main": "フォルダ画像スライドショー",
     "aria_select_folder": "フォルダを選択",
-    "aria_interval": "スライドショーの間隔(秒)"
+    "aria_interval": "スライドショーの間隔(秒)",
+    "aria_pause": "スライドショーの一時停止/再生",
+    "aria_reload": "現在のフォルダから画像を再読み込み"
   }
 });

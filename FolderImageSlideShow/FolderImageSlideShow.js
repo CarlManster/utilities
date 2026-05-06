@@ -45,9 +45,11 @@ if (window.__UNITTEST__) {
 var selectBtn       = document.getElementById('selectFolder');
 var intervalRange   = document.getElementById('intervalRange');
 var intervalValueEl = document.getElementById('intervalValue');
+var pauseBtn        = document.getElementById('pauseBtn');
 var folderInfo      = document.getElementById('folderInfo');
 var folderPath      = document.getElementById('folderPath');
 var folderCount     = document.getElementById('folderCount');
+var reloadBtn       = document.getElementById('reloadBtn');
 var emptyState      = document.getElementById('emptyState');
 var emptyIcon       = document.getElementById('emptyIcon');
 var emptySpinner    = document.getElementById('emptySpinner');
@@ -67,6 +69,8 @@ var currentIndex = 0;
 var timerId = null;
 var prevUrl = null;
 var loadId = 0; // monotonic id so a stale folder scan can't override a newer one
+var isPaused = false;
+var currentDirHandle = null;
 
 // ── Empty / slide state ──────────────────────────────────────────────────────
 
@@ -122,10 +126,39 @@ function releasePrevUrl() {
 
 function scheduleNext() {
   clearTimer();
+  if (isPaused || entries.length === 0) return;
   timerId = setTimeout(function () {
     currentIndex = (currentIndex + 1) % entries.length;
     showCurrent();
   }, intervalSec * 1000);
+}
+
+// ── Pause / Resume ───────────────────────────────────────────────────────────
+
+function updatePauseUI() {
+  pauseBtn.setAttribute('aria-pressed', String(isPaused));
+  pauseBtn.textContent = isPaused ? '▶' : '⏸';
+  var key = isPaused ? 'btn_resume' : 'btn_pause';
+  var fb  = isPaused ? 'Resume' : 'Pause';
+  var label = I18N.t(key, fb);
+  pauseBtn.setAttribute('aria-label', label);
+  pauseBtn.title = label;
+}
+
+function setPaused(paused) {
+  isPaused = paused;
+  updatePauseUI();
+}
+
+function togglePause() {
+  if (pauseBtn.disabled) return;
+  isPaused = !isPaused;
+  updatePauseUI();
+  if (isPaused) {
+    clearTimer();
+  } else {
+    scheduleNext();
+  }
 }
 
 function showCurrent() {
@@ -169,6 +202,46 @@ function getDirectoryPicker() {
   return null;
 }
 
+function loadFromHandle(dirHandle, opts) {
+  opts = opts || {};
+  // Tear down the previous run before starting the new scan so a stale
+  // `showCurrent` resolution can't leak through.
+  clearTimer();
+  releasePrevUrl();
+  loadId++;
+  entries = [];
+  currentIndex = 0;
+  currentDirHandle = dirHandle;
+
+  pauseBtn.disabled = true;
+  reloadBtn.disabled = true;
+  updateFolderInfo(dirHandle.name, 0);
+  showEmpty('loading');
+
+  var thisLoad = loadId;
+  return collectImages(dirHandle, function (n) {
+    if (thisLoad !== loadId) return;
+    updateFolderInfo(dirHandle.name, n);
+  }).then(function (found) {
+    if (thisLoad !== loadId) return;
+    entries = found;
+    updateFolderInfo(dirHandle.name, entries.length);
+    reloadBtn.disabled = false;
+
+    if (entries.length === 0) {
+      pauseBtn.disabled = true;
+      showEmpty('no_images');
+      return;
+    }
+    pauseBtn.disabled = false;
+    if (opts.resetPause) setPaused(false);
+    // Stay in the loading state until the first frame is decoded; showCurrent
+    // calls showSlide() once the image is actually loaded. scheduleNext within
+    // showCurrent respects isPaused, so a paused reload stays on the new frame.
+    showCurrent();
+  });
+}
+
 function onSelectFolder() {
   var pick = getDirectoryPicker();
   if (!pick) {
@@ -176,43 +249,19 @@ function onSelectFolder() {
     return;
   }
   pick().then(function (dirHandle) {
-    // Tear down the previous run before starting the new scan so a stale
-    // `showCurrent` resolution can't leak through.
-    clearTimer();
-    releasePrevUrl();
-    loadId++;
-    entries = [];
-    currentIndex = 0;
-
-    updateFolderInfo(dirHandle.name, 0);
-    showEmpty('loading');
-
-    var thisLoad = loadId;
-    return collectImages(dirHandle, function (n) {
-      if (thisLoad !== loadId) return;
-      updateFolderInfo(dirHandle.name, n);
-    }).then(function (found) {
-      return { dirHandle: dirHandle, found: found, thisLoad: thisLoad };
-    });
-  }).then(function (ctx) {
-    if (!ctx) return; // cancelled / superseded
-    if (ctx.thisLoad !== loadId) return;
-
-    entries = ctx.found;
-    updateFolderInfo(ctx.dirHandle.name, entries.length);
-
-    if (entries.length === 0) {
-      showEmpty('no_images');
-      return;
-    }
-    // Stay in the loading state until the first frame is decoded; showCurrent
-    // calls showSlide() once the image is actually loaded.
-    showCurrent();
+    return loadFromHandle(dirHandle, { resetPause: true });
   }).catch(function (err) {
     // AbortError = user cancelled the picker; ignore.
     if (err && err.name === 'AbortError') return;
     console.warn('[FolderImageSlideShow] folder selection failed:', err);
     showEmpty('unsupported');
+  });
+}
+
+function onReload() {
+  if (!currentDirHandle || reloadBtn.disabled) return;
+  loadFromHandle(currentDirHandle, { resetPause: false }).catch(function (err) {
+    console.warn('[FolderImageSlideShow] reload failed:', err);
   });
 }
 
@@ -250,6 +299,8 @@ function onIntervalChange() {
 
 selectBtn.addEventListener('click', onSelectFolder);
 intervalRange.addEventListener('input', onIntervalChange);
+pauseBtn.addEventListener('click', togglePause);
+reloadBtn.addEventListener('click', onReload);
 
 window.addEventListener('beforeunload', function () {
   clearTimer();
@@ -259,6 +310,7 @@ window.addEventListener('beforeunload', function () {
 Settings.ready.then(function () {
   var saved = Settings.get(STORAGE_KEY);
   applyInterval(typeof saved === 'number' ? saved : DEFAULT_INTERVAL_SEC, { persist: false });
+  updatePauseUI();
   // Always start in the "no folder" state. We only label the browser as
   // unsupported after the click handler has actually tried to open a picker,
   // since some Chromium variants only expose showDirectoryPicker on the top

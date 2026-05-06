@@ -2,6 +2,9 @@
   "title": "Folder Image Slideshow",
   "subtitle": "Pick a folder and play its images as a slideshow",
   "btn_select_folder": "Select Folder",
+  "btn_pause": "Pause",
+  "btn_resume": "Resume",
+  "btn_reload": "Reload",
   "label_interval": "INTERVAL",
   "empty_no_folder": "Select a folder to begin the slideshow.",
   "empty_loading": "Loading images...",
@@ -10,5 +13,7 @@
   "folder_count": "{n} images",
   "aria_main": "Folder image slideshow",
   "aria_select_folder": "Select folder",
-  "aria_interval": "Slideshow interval in seconds"
+  "aria_interval": "Slideshow interval in seconds",
+  "aria_pause": "Pause or resume the slideshow",
+  "aria_reload": "Reload images from the current folder"
 }
