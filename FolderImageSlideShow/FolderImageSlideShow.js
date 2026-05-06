@@ -75,6 +75,10 @@ var prevUrl = null;
 var loadId = 0; // monotonic id so a stale folder scan can't override a newer one
 var isPaused = false;
 var currentDirHandle = null;
+// Cached last folder-info args so the localised count string can be re-rendered
+// when the shell switches language without reloading the iframe.
+var lastFolderName = null;
+var lastFolderCount = 0;
 
 // ── Empty / slide state ──────────────────────────────────────────────────────
 
@@ -122,6 +126,8 @@ function showSlide() {
 }
 
 function updateFolderInfo(name, count) {
+  lastFolderName = name;
+  lastFolderCount = count;
   if (name == null) {
     folderInfo.hidden = true;
     return;
@@ -348,6 +354,14 @@ Settings.ready.then(function () {
   // since some Chromium variants only expose showDirectoryPicker on the top
   // window and the iframe's own `window` returns undefined on initial load.
   showEmpty('no_folder');
+});
+
+// Re-localize folder count and pause button label when the shell switches
+// language. The folder handle itself is preserved because the iframe is no
+// longer reloaded on settings changes.
+I18N.onLangChange(function () {
+  if (lastFolderName != null) updateFolderInfo(lastFolderName, lastFolderCount);
+  updatePauseUI();
 });
 
 })();

@@ -230,3 +230,7 @@ function sortTable(col) {
 
 // Auto-calculate after settings/i18n ready
 Settings.ready.then(function() { calculate(); });
+
+// Re-render dynamic strings (table headers, summary text, error messages) when
+// the shell switches language without reloading the iframe.
+I18N.onLangChange(function () { calculate(); });

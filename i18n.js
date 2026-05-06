@@ -1,14 +1,31 @@
 var I18N = (function () {
   var _data = {};
   var _allLangs = {};
+  var _currentLang = null;
+  var _listeners = [];
 
   function register(langs) {
     _allLangs = langs;
   }
 
   function setLang(lang) {
+    var changed = (_currentLang !== lang);
+    _currentLang = lang;
     _data = _allLangs[lang] || _allLangs['en'] || {};
     applyDOM();
+    if (changed) {
+      for (var i = 0; i < _listeners.length; i++) {
+        try { _listeners[i](lang); } catch (e) { /* ignore listener errors */ }
+      }
+    }
+  }
+
+  // Register a callback that fires after every language change. Modules with
+  // dynamic strings (rendered via I18N.t(...) into innerHTML / textContent /
+  // ARIA attributes) should subscribe and re-render — applyDOM() only handles
+  // static data-i18n* attributes.
+  function onLangChange(cb) {
+    if (typeof cb === 'function') _listeners.push(cb);
   }
 
   function getLang() {
@@ -53,5 +70,12 @@ var I18N = (function () {
     return s;
   }
 
-  return { register: register, setLang: setLang, getLang: getLang, t: t, apply: applyDOM };
+  return {
+    register: register,
+    setLang: setLang,
+    getLang: getLang,
+    t: t,
+    apply: applyDOM,
+    onLangChange: onLangChange
+  };
 })();

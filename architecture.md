@@ -19,12 +19,14 @@ utilities/
 ├── README.md
 ├── LICENSE
 │
-├── ColorPicker/            # ─┐
-├── DayInfo/                #  │ Each subfolder is one self-contained
-├── Dices/                  #  │ utility (HTML + CSS + JS + i18n).
-├── JSONVisualizer/         #  │
-├── QRGenerator/            #  │
-└── Repayment/              # ─┘
+├── ColorPicker/                # ─┐
+├── DayInfo/                    #  │
+├── Dices/                      #  │ Each subfolder is one self-contained
+├── ExchangeRate/               #  │ utility (HTML + CSS + JS + i18n).
+├── FolderImageSlideShow/       #  │
+├── JSONVisualizer/             #  │
+├── QRGenerator/                #  │
+└── Repayment/                  # ─┘
 ```
 
 Each utility folder follows the same convention:
@@ -45,8 +47,8 @@ Translation source-of-truth is the per-language JSON. `build_lang.sh` reads the 
 The shell hosts each utility inside an `<iframe>`. It is **not** a SPA — each utility is its own document, navigated by swapping `iframe.src`.
 
 - **Navigation**: `<a class="nav-link" data-src="QRGenerator/QRGenerator.html">` entries; `navigate(el)` updates `.active`, persists `lastpage` via `Settings.set`, swaps the iframe src.
-- **Param propagation**: `iframeParams()` builds `?lang=X&theme=Y` and appends it to every iframe URL so the embedded utility starts in the right language and theme without having to read cookies itself.
-- **Settings panel**: an overlay (`#settingsOverlay`) with three selects — language, default page, screen mode. Changes are saved to `utilities_setting` and re-applied immediately (the iframe reloads with the new params).
+- **Param propagation**: `iframeParams()` builds `?lang=X&theme=Y` and appends it to every iframe URL so the embedded utility starts in the right language and theme on a fresh navigation, without having to read cookies itself.
+- **Settings panel**: an overlay (`#settingsOverlay`) with three selects — language, default page, screen mode. Changes are saved to `utilities_setting`. **Language and screen-mode changes are propagated live to the embedded utility without reloading the iframe** — the shell calls `iframe.contentWindow.I18N.setLang(...)` and `iframe.contentWindow.Settings.applyScreenMode(...)` directly (same-origin). This preserves any in-memory state the utility holds, e.g. FolderImageSlideShow's `FileSystemDirectoryHandle`, which would otherwise be lost on reload. Default-page changes don't touch the iframe at all (they only affect the next session's start page).
 
 ## Shared infrastructure
 
@@ -56,6 +58,7 @@ The shell hosts each utility inside an `<iframe>`. It is **not** a SPA — each 
 I18N.register({ en: {...}, ko: {...}, jp: {...} })
 I18N.setLang('ko')                    // applies translations to the live DOM
 I18N.t('key', fallback?, params?)     // dynamic lookup
+I18N.onLangChange(function (lang) {…}) // subscribe to live language changes
 ```
 
 Modules use these markup attributes:
@@ -67,7 +70,9 @@ Modules use these markup attributes:
 | `data-i18n-title` | Replaces `title` attribute. |
 | `data-i18n-aria` | Replaces `aria-label`. |
 
-Dynamic strings (errors, announcements) use `I18N.t(key, fallback, {param: ...})`.
+Dynamic strings (errors, announcements, table cells, programmatic ARIA labels) use `I18N.t(key, fallback, {param: ...})`.
+
+**Live language changes.** The shell's settings panel triggers `I18N.setLang(newLang)` inside the iframe via `iframe.contentWindow` (same-origin, no reload). `setLang` re-applies translations to all `data-i18n*` attributes via `applyDOM()`, then notifies any `I18N.onLangChange(cb)` listeners. Static markup is therefore handled automatically; modules with **dynamic** `I18N.t(...)` calls must subscribe via `onLangChange` and re-run their render to refresh those strings. ColorPicker and JSONVisualizer use only static `data-i18n*` and need no subscription.
 
 > Limitation: `I18N.register()` **overwrites** the registry, so it must be called once per page (the per-module `_lang.js` does this). The unit test harness loads all `_lang.js` files in sequence; this is fine because tests register their own data when needed.
 
@@ -93,7 +98,7 @@ Boot sequence: `init()` → open keystore IDB → load-or-generate `CryptoKey` �
 
 ### Screen mode (light/dark)
 
-`Settings.applyScreenMode(mode)` toggles `data-theme="light|dark"` on `<html>`. Each utility's CSS provides three variants: a base `:root` (light), `@media (prefers-color-scheme: dark)`, and explicit `:root[data-theme="dark"]` / `:root[data-theme="light"]` overrides so users can force a mode regardless of system preference.
+`Settings.applyScreenMode(mode)` toggles `data-theme="light|dark"` on `<html>`. Each utility's CSS provides three variants: a base `:root` (light), `@media (prefers-color-scheme: dark)`, and explicit `:root[data-theme="dark"]` / `:root[data-theme="light"]` overrides so users can force a mode regardless of system preference. Theme is purely CSS-driven — when the shell switches modes, it just calls `iframe.contentWindow.Settings.applyScreenMode(mode)` and the iframe's CSS variables react via the attribute selector. No JS re-render is needed in modules.
 
 ### `build_lang.sh`
 
@@ -140,6 +145,19 @@ Each module is a single document. They share the same conventions (i18n attribut
 - **Core**: IIFE module. `parseAmount()` strips non-digits; slider/input pairs stay synced. Computes per-period rows and renders a summary + amortization table.
 - **Persistence**: Settings persistence under `repayment.{principal, period, holding, interest}`. Restored on `Settings.ready`.
 
+### ExchangeRate
+- **Purpose**: Convert a KRW amount (or the reverse direction) to all world currencies using `@fawazahmed0/currency-api` data via jsDelivr.
+- **Core**: IIFE module. Fetches `currencies.json` + `currencies/krw.json` once, then re-renders the table on amount/search input. `compareRows` powers click-to-sort headers (code / name / amount). A reverse toggle swaps direction (KRW → each ↔ each → KRW) and persists alongside sort state.
+- **Persistence**: `exchangeRate.{sortCol, sortDir, reversed}`.
+- **Live i18n**: The cached `currentRefDate` lets the status line ("Reference date: …") be re-localised on language change without a refetch.
+
+### FolderImageSlideShow
+- **Purpose**: Pick a local folder via the File System Access API and play its images as a slideshow.
+- **Core**: IIFE module. `getDirectoryPicker()` falls back from `window.showDirectoryPicker` to `window.top.showDirectoryPicker` because some Chromium variants only expose the API on the top frame. `collectImages()` iterates the directory yielding to `requestAnimationFrame` every 50 entries and reports progress via an `onProgress(n)` callback so the count UI updates live during the scan. A monotonic `loadId` invalidates stale scans when the user picks another folder mid-load. `showCurrent()` keeps the loading state visible until the first frame is decoded, and a saved `currentDirHandle` powers the Reload button.
+- **Persistence**: `slideshow.interval` (seconds, 0.5 step, min 1, max 10).
+- **Error states**: distinct messages for `no_images`, `unsupported`, `blocked` (iframe / insecure origin), `denied` (NotAllowedError), `read_error` (NotFoundError / NotReadableError), and `unknown`. AbortError on cancel is silent.
+- **Notable**: Pause/Resume button respects `isPaused` inside `scheduleNext`; Reload preserves the current pause state; live language changes refresh the localized image count and pause-button label using the cached `lastFolderName` / `lastFolderCount`.
+
 ## Cross-cutting conventions
 
 - **No build step for code.** A user can serve the directory with any static server. Only translation `_lang.js` files are generated, by `build_lang.sh`.
@@ -147,7 +165,7 @@ Each module is a single document. They share the same conventions (i18n attribut
 - **IIFE wrapping** is used in `DayInfo.js`, `Repayment.js`, `QRGenerator.js`. New utilities should follow this to keep the global namespace clean.
 - **Test exposure** uses the `window.__UNITTEST__` flag set by `unittest.html` *before* any source file loads. A module checks this flag and either exposes pure helpers on a `_<Module>` global or runs normal init.
 - **Screen mode** support is mandatory: every module ships both `@media (prefers-color-scheme: dark)` and `[data-theme="dark"]` / `[data-theme="light"]` rules, sourcing colors from CSS variables.
-- **i18n** is mandatory for visible text. Static strings use `data-i18n*` attributes; dynamic strings use `I18N.t(key, fallback, params)` so the fallback survives if the key is missing.
+- **i18n** is mandatory for visible text. Static strings use `data-i18n*` attributes; dynamic strings use `I18N.t(key, fallback, params)` so the fallback survives if the key is missing. Modules that render dynamic strings must subscribe via `I18N.onLangChange(cb)` so they re-render when the shell propagates a language change live (no iframe reload).
 
 ## Testing — `unittest.html`
 
@@ -167,6 +185,7 @@ Currently covered: I18N, Settings, DayInfo (date/calendar conversions, Julian Da
 2. The HTML loads `../i18n.js`, `<Module>_lang.js`, `../settings.js`, then `<Module>.js` — in that order.
 3. Wrap the JS in an IIFE; gate first render on `Settings.ready`.
 4. Add the module to `build_lang.sh`'s `pages` array.
-5. Add a nav link to `index.html` (`data-src=...`) and a default-page option, plus `nav_<key>` and `page_<key>` translations in the three index JSONs and `index_lang.js`.
+5. Add a nav link to `index.html` (`data-src=...`) and a default-page option, plus `nav_<key>` and `page_<key>` translations in the three index JSONs (then run `build_lang.sh`).
 6. Use CSS variables and provide both prefers-color-scheme and `[data-theme]` overrides.
-7. (Optional but recommended) Expose pure helpers under `window._<Module>` when `window.__UNITTEST__` is set, then add a suite to `unittest.html`.
+7. If the module renders dynamic strings via `I18N.t(...)`, subscribe via `I18N.onLangChange(cb)` and re-render — otherwise users will see stale text after switching languages (the shell does *not* reload the iframe on language changes anymore).
+8. (Optional but recommended) Expose pure helpers under `window._<Module>` when `window.__UNITTEST__` is set, then add a suite to `unittest.html`.

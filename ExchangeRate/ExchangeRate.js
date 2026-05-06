@@ -53,6 +53,10 @@ var rates = {};
 var reversed = false;
 var sortCol = 'code';
 var sortDir = 'asc';
+// Cached reference date string (already formatted) so the status line can be
+// re-localised without a refetch when the shell switches language.
+var currentRefDate = null;
+var loadFailed = false;
 
 // ── DOM references ───────────────────────────────────────────────────────────
 
@@ -137,6 +141,8 @@ function parseApiDate(dateStr) {
 }
 
 function loadData() {
+  loadFailed = false;
+  currentRefDate = null;
   setStatus(I18N.t('loading', 'Loading...'), false);
 
   Promise.all([
@@ -147,9 +153,11 @@ function loadData() {
     var rateData  = results[1];
     rates = rateData.krw;
 
-    setStatus(I18N.t('date_prefix', 'Reference date: ') + parseApiDate(rateData.date), false);
+    currentRefDate = parseApiDate(rateData.date);
+    setStatus(I18N.t('date_prefix', 'Reference date: ') + currentRefDate, false);
     renderTable();
   }).catch(function (err) {
+    loadFailed = true;
     setStatus(I18N.t('error_load', 'Failed to load exchange rate data.'), true);
     console.error(err);
   });
@@ -238,6 +246,18 @@ Settings.ready.then(function () {
   }
   applySortIndicator();
   loadData();
+});
+
+// Re-localize the status line, unit label, and table on shell-side language
+// changes (no iframe reload).
+I18N.onLangChange(function () {
+  if (loadFailed) {
+    setStatus(I18N.t('error_load', 'Failed to load exchange rate data.'), true);
+  } else if (currentRefDate) {
+    setStatus(I18N.t('date_prefix', 'Reference date: ') + currentRefDate, false);
+  }
+  updateUnitLabel();
+  renderTable();
 });
 
 })();

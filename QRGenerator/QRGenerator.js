@@ -421,4 +421,11 @@ if (typeof Settings !== 'undefined' && Settings.ready) {
   });
 }
 
+// Refresh dynamic ARIA labels, recent-list strings, and any error text when
+// the shell switches language without reloading the iframe.
+I18N.onLangChange(() => {
+  render();
+  renderRecent();
+});
+
 })();

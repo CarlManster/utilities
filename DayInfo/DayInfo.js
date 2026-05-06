@@ -937,6 +937,12 @@ if (window.__UNITTEST__) {
   };
 } else {
   Settings.ready.then(function () { init(); });
+  // Refresh day-card text, API-key button label, and DOW/month arrays when the
+  // shell switches language without reloading the iframe.
+  I18N.onLangChange(function () {
+    updateKeyButton();
+    render();
+  });
 }
 
 })();

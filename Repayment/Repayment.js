@@ -202,4 +202,8 @@ Settings.ready.then(function () {
   calculate();
 });
 
+// Refresh the "Monthly Principal / Monthly Payment" label when the shell
+// switches language without reloading the iframe.
+I18N.onLangChange(function () { calculate(); });
+
 })();

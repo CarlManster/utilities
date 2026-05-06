@@ -90,10 +90,13 @@ Settings.ready.then(function() {
     Settings.set('lang', newLang).then(function() {
       document.documentElement.lang = newLang === 'jp' ? 'ja' : newLang;
       I18N.setLang(newLang);
-      var iframe = document.getElementById('content');
-      var active = document.querySelector('.nav-link.active');
-      var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
-      iframe.src = base + iframeParams();
+      // Live-propagate to the embedded utility (same-origin) instead of
+      // reloading the iframe — preserves in-memory state such as the
+      // FolderImageSlideShow's directory handle.
+      try {
+        var w = document.getElementById('content').contentWindow;
+        if (w && w.I18N && w.I18N.setLang) w.I18N.setLang(newLang);
+      } catch (e) {}
     });
   });
 
@@ -114,10 +117,12 @@ Settings.ready.then(function() {
     var mode = this.value;
     Settings.set('screenmode', mode);
     Settings.applyScreenMode(mode);
-    var iframe = document.getElementById('content');
-    var active = document.querySelector('.nav-link.active');
-    var base = active ? active.dataset.src : 'Dices/DiceCalculator.html';
-    iframe.src = base + iframeParams();
+    // Theme is purely CSS-driven via [data-theme]; calling applyScreenMode in
+    // the iframe toggles its own document attribute and CSS variables react.
+    try {
+      var w = document.getElementById('content').contentWindow;
+      if (w && w.Settings && w.Settings.applyScreenMode) w.Settings.applyScreenMode(mode);
+    } catch (e) {}
   });
 
   /* ── Initial page load ── */
