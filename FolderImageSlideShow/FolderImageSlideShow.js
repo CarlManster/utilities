@@ -57,6 +57,10 @@ var emptyNoFolder   = document.getElementById('emptyTextNoFolder');
 var emptyLoading    = document.getElementById('emptyTextLoading');
 var emptyNoImages   = document.getElementById('emptyTextNoImages');
 var emptyUnsupported = document.getElementById('emptyTextUnsupported');
+var emptyBlocked    = document.getElementById('emptyTextBlocked');
+var emptyDenied     = document.getElementById('emptyTextDenied');
+var emptyReadError  = document.getElementById('emptyTextReadError');
+var emptyUnknown    = document.getElementById('emptyTextUnknown');
 var slide           = document.getElementById('slide');
 var viewer          = document.getElementById('viewer');
 var caption         = document.getElementById('caption');
@@ -78,8 +82,28 @@ var EMPTY_VIEWS = {
   no_folder: emptyNoFolder,
   loading: emptyLoading,
   no_images: emptyNoImages,
-  unsupported: emptyUnsupported
+  unsupported: emptyUnsupported,
+  blocked: emptyBlocked,
+  denied: emptyDenied,
+  read_error: emptyReadError,
+  unknown: emptyUnknown
 };
+
+function isInIframe() {
+  try { return window.self !== window.top; } catch (e) { return true; }
+}
+
+// Map a thrown DOMException to one of the EMPTY_VIEWS keys.
+function mapErrorToState(err, fallback) {
+  if (!err) return fallback || 'unknown';
+  switch (err.name) {
+    case 'NotAllowedError': return 'denied';
+    case 'SecurityError':   return 'blocked';
+    case 'NotFoundError':   return 'read_error';
+    case 'NotReadableError': return 'read_error';
+    default:                return fallback || 'unknown';
+  }
+}
 
 function showEmpty(which) {
   Object.keys(EMPTY_VIEWS).forEach(function (key) {
@@ -239,30 +263,38 @@ function loadFromHandle(dirHandle, opts) {
     // calls showSlide() once the image is actually loaded. scheduleNext within
     // showCurrent respects isPaused, so a paused reload stays on the new frame.
     showCurrent();
+  }).catch(function (err) {
+    if (thisLoad !== loadId) return;
+    pauseBtn.disabled = true;
+    // Reload remains usable so the user can retry the same handle.
+    reloadBtn.disabled = false;
+    console.warn('[FolderImageSlideShow] folder read failed:', err);
+    showEmpty(mapErrorToState(err, 'read_error'));
   });
 }
 
 function onSelectFolder() {
   var pick = getDirectoryPicker();
   if (!pick) {
-    showEmpty('unsupported');
+    // No accessible API at all. Distinguish iframe-blocked from genuinely
+    // unsupported so the user knows whether to switch browsers or escape the
+    // iframe.
+    showEmpty(isInIframe() ? 'blocked' : 'unsupported');
     return;
   }
   pick().then(function (dirHandle) {
     return loadFromHandle(dirHandle, { resetPause: true });
   }).catch(function (err) {
-    // AbortError = user cancelled the picker; ignore.
+    // AbortError = user cancelled the picker; keep the previous state.
     if (err && err.name === 'AbortError') return;
     console.warn('[FolderImageSlideShow] folder selection failed:', err);
-    showEmpty('unsupported');
+    showEmpty(mapErrorToState(err, 'unknown'));
   });
 }
 
 function onReload() {
   if (!currentDirHandle || reloadBtn.disabled) return;
-  loadFromHandle(currentDirHandle, { resetPause: false }).catch(function (err) {
-    console.warn('[FolderImageSlideShow] reload failed:', err);
-  });
+  loadFromHandle(currentDirHandle, { resetPause: false });
 }
 
 function collectImages(dirHandle, onProgress) {

@@ -67,8 +67,12 @@
       <div class="empty-spinner" id="emptySpinner" aria-hidden="true" hidden></div>
       <p class="empty-text" id="emptyTextNoFolder" data-i18n="empty_no_folder">Select a folder to begin the slideshow.</p>
       <p class="empty-text" id="emptyTextLoading" data-i18n="empty_loading" hidden>Loading images...</p>
-      <p class="empty-text" id="emptyTextNoImages" data-i18n="empty_no_images" hidden>No image files were found in the selected folder. Pick another folder.</p>
-      <p class="empty-text empty-error" id="emptyTextUnsupported" data-i18n="empty_unsupported" hidden>This browser does not support folder selection. Try a recent Chromium-based browser.</p>
+      <p class="empty-text" id="emptyTextNoImages" data-i18n="empty_no_images" hidden>No images found in the selected folder. Pick another folder or add some image files.</p>
+      <p class="empty-text empty-error" id="emptyTextUnsupported" data-i18n="empty_unsupported" hidden>Your browser does not provide the folder-picker API. Use a recent Chromium-based browser served over HTTPS.</p>
+      <p class="empty-text empty-error" id="emptyTextBlocked" data-i18n="empty_blocked" hidden>Folder access is blocked in this context (typically an iframe or insecure origin). Open this page in a new top-level tab over HTTPS.</p>
+      <p class="empty-text empty-error" id="emptyTextDenied" data-i18n="empty_denied" hidden>Permission to read the folder was denied. Click Select Folder to try again.</p>
+      <p class="empty-text empty-error" id="emptyTextReadError" data-i18n="empty_read_error" hidden>Could not read the folder contents. The folder may have been moved or removed.</p>
+      <p class="empty-text empty-error" id="emptyTextUnknown" data-i18n="empty_unknown" hidden>An unexpected error occurred. Check the browser console for details.</p>
     </div>
 
     <figure class="slide" id="slide" hidden>
