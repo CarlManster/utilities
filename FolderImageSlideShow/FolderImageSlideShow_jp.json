@@ -4,8 +4,10 @@
   "btn_select_folder": "フォルダを選択",
   "label_interval": "間隔",
   "empty_no_folder": "スライドショーを開始するにはフォルダを選択してください。",
+  "empty_loading": "画像を読み込み中...",
   "empty_no_images": "選択したフォルダに画像ファイルがありません。別のフォルダを選択してください。",
   "empty_unsupported": "このブラウザはフォルダ選択に対応していません。最新の Chromium 系ブラウザでお試しください。",
+  "folder_count": "画像 {n}枚",
   "aria_main": "フォルダ画像スライドショー",
   "aria_select_folder": "フォルダを選択",
   "aria_interval": "スライドショーの間隔(秒)"

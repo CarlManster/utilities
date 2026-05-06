@@ -45,8 +45,14 @@ if (window.__UNITTEST__) {
 var selectBtn       = document.getElementById('selectFolder');
 var intervalRange   = document.getElementById('intervalRange');
 var intervalValueEl = document.getElementById('intervalValue');
+var folderInfo      = document.getElementById('folderInfo');
+var folderPath      = document.getElementById('folderPath');
+var folderCount     = document.getElementById('folderCount');
 var emptyState      = document.getElementById('emptyState');
+var emptyIcon       = document.getElementById('emptyIcon');
+var emptySpinner    = document.getElementById('emptySpinner');
 var emptyNoFolder   = document.getElementById('emptyTextNoFolder');
+var emptyLoading    = document.getElementById('emptyTextLoading');
 var emptyNoImages   = document.getElementById('emptyTextNoImages');
 var emptyUnsupported = document.getElementById('emptyTextUnsupported');
 var slide           = document.getElementById('slide');
@@ -66,6 +72,7 @@ var loadId = 0; // monotonic id so a stale folder scan can't override a newer on
 
 var EMPTY_VIEWS = {
   no_folder: emptyNoFolder,
+  loading: emptyLoading,
   no_images: emptyNoImages,
   unsupported: emptyUnsupported
 };
@@ -74,6 +81,9 @@ function showEmpty(which) {
   Object.keys(EMPTY_VIEWS).forEach(function (key) {
     EMPTY_VIEWS[key].hidden = (key !== which);
   });
+  var loading = (which === 'loading');
+  emptyIcon.hidden = loading;
+  emptySpinner.hidden = !loading;
   emptyState.hidden = false;
   slide.hidden = true;
 }
@@ -81,6 +91,17 @@ function showEmpty(which) {
 function showSlide() {
   emptyState.hidden = true;
   slide.hidden = false;
+}
+
+function updateFolderInfo(name, count) {
+  if (name == null) {
+    folderInfo.hidden = true;
+    return;
+  }
+  folderInfo.hidden = false;
+  folderPath.textContent = name;
+  folderPath.title = name;
+  folderCount.textContent = I18N.t('folder_count', '{n} images', { n: count });
 }
 
 // ── Slideshow ────────────────────────────────────────────────────────────────
@@ -119,6 +140,7 @@ function showCurrent() {
     caption.textContent = entry.name;
     releasePrevUrl();
     prevUrl = url;
+    showSlide(); // first frame ready: leave the loading state
     scheduleNext();
   }).catch(function () {
     if (thisLoad !== loadId) return;
@@ -154,34 +176,54 @@ function onSelectFolder() {
     return;
   }
   pick().then(function (dirHandle) {
-    return collectImages(dirHandle);
-  }).then(function (found) {
+    // Tear down the previous run before starting the new scan so a stale
+    // `showCurrent` resolution can't leak through.
     clearTimer();
     releasePrevUrl();
     loadId++;
-    entries = found;
+    entries = [];
     currentIndex = 0;
+
+    updateFolderInfo(dirHandle.name, 0);
+    showEmpty('loading');
+
+    var thisLoad = loadId;
+    return collectImages(dirHandle, function (n) {
+      if (thisLoad !== loadId) return;
+      updateFolderInfo(dirHandle.name, n);
+    }).then(function (found) {
+      return { dirHandle: dirHandle, found: found, thisLoad: thisLoad };
+    });
+  }).then(function (ctx) {
+    if (!ctx) return; // cancelled / superseded
+    if (ctx.thisLoad !== loadId) return;
+
+    entries = ctx.found;
+    updateFolderInfo(ctx.dirHandle.name, entries.length);
 
     if (entries.length === 0) {
       showEmpty('no_images');
       return;
     }
-    showSlide();
+    // Stay in the loading state until the first frame is decoded; showCurrent
+    // calls showSlide() once the image is actually loaded.
     showCurrent();
   }).catch(function (err) {
     // AbortError = user cancelled the picker; ignore.
     if (err && err.name === 'AbortError') return;
+    console.warn('[FolderImageSlideShow] folder selection failed:', err);
     showEmpty('unsupported');
   });
 }
 
-function collectImages(dirHandle) {
+function collectImages(dirHandle, onProgress) {
   var collected = [];
   var seen = 0;
   return (async function () {
     for await (var entry of dirHandle.values()) {
       if (entry.kind === 'file' && isImageFile(entry.name)) {
         collected.push(entry);
+        if (onProgress) onProgress(collected.length);
       }
       if (++seen % 50 === 0) await new Promise(requestAnimationFrame);
     }

@@ -4,8 +4,10 @@
   "btn_select_folder": "폴더 선택",
   "label_interval": "간격",
   "empty_no_folder": "슬라이드쇼를 시작하려면 폴더를 선택해 주세요.",
+  "empty_loading": "이미지를 불러오는 중...",
   "empty_no_images": "선택한 폴더에 이미지 파일이 없습니다. 다른 폴더를 선택해 주세요.",
   "empty_unsupported": "이 브라우저는 폴더 선택 기능을 지원하지 않습니다. 최신 Chromium 계열 브라우저에서 시도해 주세요.",
+  "folder_count": "이미지 {n}개",
   "aria_main": "폴더 이미지 슬라이드쇼",
   "aria_select_folder": "폴더 선택",
   "aria_interval": "슬라이드쇼 간격(초)"

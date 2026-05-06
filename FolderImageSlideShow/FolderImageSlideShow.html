@@ -33,10 +33,18 @@
     </div>
   </div>
 
+  <div class="folder-info" id="folderInfo" hidden>
+    <span class="folder-icon" aria-hidden="true">&#x1F4C1;</span>
+    <span class="folder-path" id="folderPath"></span>
+    <span class="folder-count" id="folderCount" aria-live="polite"></span>
+  </div>
+
   <div class="viewer-area">
     <div class="empty-state" id="emptyState" role="status" aria-live="polite">
-      <div class="empty-icon" aria-hidden="true">&#x1F4C1;</div>
+      <div class="empty-icon" id="emptyIcon" aria-hidden="true">&#x1F4C1;</div>
+      <div class="empty-spinner" id="emptySpinner" aria-hidden="true" hidden></div>
       <p class="empty-text" id="emptyTextNoFolder" data-i18n="empty_no_folder">Select a folder to begin the slideshow.</p>
+      <p class="empty-text" id="emptyTextLoading" data-i18n="empty_loading" hidden>Loading images...</p>
       <p class="empty-text" id="emptyTextNoImages" data-i18n="empty_no_images" hidden>No image files were found in the selected folder. Pick another folder.</p>
       <p class="empty-text empty-error" id="emptyTextUnsupported" data-i18n="empty_unsupported" hidden>This browser does not support folder selection. Try a recent Chromium-based browser.</p>
     </div>
