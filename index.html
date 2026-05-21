@@ -56,6 +56,14 @@
         <option value="dark" data-i18n="mode_dark">Dark</option>
       </select>
     </div>
+    <div class="settings-group">
+      <div class="settings-label" data-i18n="settings_zoom">Zoom</div>
+      <div class="zoom-controls">
+        <button type="button" class="zoom-btn" id="zoomOutBtn" data-i18n-aria="zoom_out" aria-label="Zoom out">&minus;</button>
+        <span class="zoom-value" id="zoomValue">100%</span>
+        <button type="button" class="zoom-btn" id="zoomInBtn" data-i18n-aria="zoom_in" aria-label="Zoom in">+</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -124,6 +132,41 @@ Settings.ready.then(function() {
       if (w && w.Settings && w.Settings.applyScreenMode) w.Settings.applyScreenMode(mode);
     } catch (e) {}
   });
+
+  /* ── Zoom ── */
+  var ZOOM_MIN = 50, ZOOM_MAX = 200, ZOOM_STEP = 10;
+  var zoom = parseInt(Settings.get('zoom'), 10);
+  if (isNaN(zoom) || zoom < ZOOM_MIN || zoom > ZOOM_MAX) zoom = 100;
+
+  var zoomValEl = document.getElementById('zoomValue');
+  var zoomOutBtn = document.getElementById('zoomOutBtn');
+  var zoomInBtn = document.getElementById('zoomInBtn');
+
+  function refreshZoomUI() {
+    zoomValEl.textContent = zoom + '%';
+    zoomOutBtn.disabled = zoom <= ZOOM_MIN;
+    zoomInBtn.disabled = zoom >= ZOOM_MAX;
+  }
+
+  function propagateZoom() {
+    try {
+      var w = document.getElementById('content').contentWindow;
+      if (w && w.Settings && w.Settings.applyZoom) w.Settings.applyZoom(zoom);
+    } catch (e) {}
+  }
+
+  function changeZoom(delta) {
+    var next = zoom + delta;
+    if (next < ZOOM_MIN || next > ZOOM_MAX) return;
+    zoom = next;
+    Settings.set('zoom', zoom);
+    refreshZoomUI();
+    propagateZoom();
+  }
+
+  zoomOutBtn.addEventListener('click', function() { changeZoom(-ZOOM_STEP); });
+  zoomInBtn.addEventListener('click', function() { changeZoom(ZOOM_STEP); });
+  refreshZoomUI();
 
   /* ── Initial page load ── */
   var defaultpage = Settings.get('defaultpage');

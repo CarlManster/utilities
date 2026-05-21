@@ -158,6 +158,7 @@ var Settings = (function () {
       }
 
       applyScreenMode(_data.screenmode || 'auto');
+      applyZoom(_data.zoom || 100);
 
       _readyResolve();
     }).catch(function () {
@@ -201,6 +202,20 @@ var Settings = (function () {
     }
   }
 
+  /* -- Zoom --
+   * Only applied inside the embedded iframe — the parent shell's navbar must
+   * stay at native size. CSS `zoom` is supported across modern browsers and
+   * reflows correctly (unlike `transform: scale`). */
+  function applyZoom(z) {
+    if (window.self === window.top) return;
+    var n = parseInt(z, 10);
+    if (isNaN(n) || n === 100) {
+      document.documentElement.style.zoom = '';
+    } else {
+      document.documentElement.style.zoom = (n / 100);
+    }
+  }
+
   /* -- Generic encrypted cookie helpers (use the same key/scheme as the main settings cookie) -- */
   function readEncryptedCookie(name) {
     var raw = readCookie(name);
@@ -221,6 +236,7 @@ var Settings = (function () {
     set: set,
     save: save,
     applyScreenMode: applyScreenMode,
+    applyZoom: applyZoom,
     readEncryptedCookie: readEncryptedCookie,
     writeEncryptedCookie: writeEncryptedCookie
   };

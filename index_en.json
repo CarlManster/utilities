@@ -26,5 +26,8 @@
   "settings_screenmode": "Screen Mode",
   "mode_auto": "Auto",
   "mode_light": "Light",
-  "mode_dark": "Dark"
+  "mode_dark": "Dark",
+  "settings_zoom": "Zoom",
+  "zoom_out": "Zoom out",
+  "zoom_in": "Zoom in"
 }

@@ -27,7 +27,10 @@ I18N.register({
     "settings_screenmode": "Screen Mode",
     "mode_auto": "Auto",
     "mode_light": "Light",
-    "mode_dark": "Dark"
+    "mode_dark": "Dark",
+    "settings_zoom": "Zoom",
+    "zoom_out": "Zoom out",
+    "zoom_in": "Zoom in"
   },
   "ko": {
     "brand": "Utilities",
@@ -57,7 +60,10 @@ I18N.register({
     "settings_screenmode": "화면 모드",
     "mode_auto": "자동",
     "mode_light": "라이트",
-    "mode_dark": "다크"
+    "mode_dark": "다크",
+    "settings_zoom": "확대/축소",
+    "zoom_out": "축소",
+    "zoom_in": "확대"
   },
   "jp": {
     "brand": "Utilities",
@@ -87,6 +93,9 @@ I18N.register({
     "settings_screenmode": "画面モード",
     "mode_auto": "自動",
     "mode_light": "ライト",
-    "mode_dark": "ダーク"
+    "mode_dark": "ダーク",
+    "settings_zoom": "拡大/縮小",
+    "zoom_out": "縮小",
+    "zoom_in": "拡大"
   }
 });

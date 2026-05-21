@@ -40,12 +40,22 @@ nav .brand {
   font-size: 1rem;
   margin-right: 2rem;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 nav .nav-links {
   display: flex;
   gap: 0;
   height: 100%;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
+nav .nav-links::-webkit-scrollbar { display: none; }
+nav .nav-link { flex-shrink: 0; }
 nav .nav-link {
   display: flex;
   align-items: center;
@@ -84,6 +94,7 @@ nav .nav-link[data-src^="ExchangeRate"].active::before {
 /* ─── Settings button ─── */
 .settings-btn {
   margin-left: auto;
+  flex-shrink: 0;
   width: 42px;
   height: 42px;
   border: none;
@@ -175,6 +186,46 @@ nav .nav-link[data-src^="ExchangeRate"].active::before {
 .settings-select option {
   background: var(--nav-bg);
   color: var(--nav-brand);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.zoom-btn {
+  flex: 0 0 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  color: var(--nav-brand);
+  font-size: 18px;
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+.zoom-btn:hover:not(:disabled) {
+  border-color: var(--nav-active-bg);
+  background: rgba(255,255,255,0.12);
+}
+.zoom-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.zoom-value {
+  flex: 1;
+  text-align: center;
+  color: var(--nav-brand);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 
 iframe {

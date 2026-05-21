@@ -26,5 +26,8 @@
   "settings_screenmode": "画面モード",
   "mode_auto": "自動",
   "mode_light": "ライト",
-  "mode_dark": "ダーク"
+  "mode_dark": "ダーク",
+  "settings_zoom": "拡大/縮小",
+  "zoom_out": "縮小",
+  "zoom_in": "拡大"
 }
