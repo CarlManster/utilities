@@ -194,7 +194,8 @@ nav .nav-link[data-src^="ExchangeRate"].active::before {
   gap: 8px;
 }
 .zoom-btn {
-  flex: 0 0 34px;
+  flex: 1 1 0;
+  min-width: 0;
   height: 34px;
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 6px;
@@ -219,11 +220,11 @@ nav .nav-link[data-src^="ExchangeRate"].active::before {
   cursor: not-allowed;
 }
 .zoom-value {
-  flex: 1;
+  flex: 0 0 64px;
   text-align: center;
-  color: var(--nav-brand);
-  font-size: 13px;
-  font-weight: 500;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   user-select: none;
 }
