@@ -1,0 +1,13 @@
+{
+  "title": "文字数カウンター",
+  "label_words": "単語",
+  "label_chars": "文字",
+  "label_chars_no_spaces": "空白を除く",
+  "label_bytes": "バイト (UTF-8)",
+  "text_label": "テキスト",
+  "input_placeholder": "テキストを入力または貼り付けてください...",
+  "clear_btn": "クリア",
+  "aria_main": "文字数カウンター",
+  "aria_clear_btn": "テキストをクリア",
+  "announce_cleared": "テキストをクリアしました"
+}

@@ -17,7 +17,8 @@ var pages = [
   { dir: 'Repayment', name: 'Repayment' },
   { dir: 'QRGenerator', name: 'QRGenerator' },
   { dir: 'ExchangeRate', name: 'ExchangeRate' },
-  { dir: 'FolderImageSlideShow', name: 'FolderImageSlideShow' }
+  { dir: 'FolderImageSlideShow', name: 'FolderImageSlideShow' },
+  { dir: 'WordCounter', name: 'WordCounter' }
 ];
 
 var langs = ['en', 'ko', 'jp'];
