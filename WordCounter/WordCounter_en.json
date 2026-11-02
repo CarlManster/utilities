@@ -1,0 +1,13 @@
+{
+  "title": "Word Counter",
+  "label_words": "Words",
+  "label_chars": "Characters",
+  "label_chars_no_spaces": "Excl. spaces",
+  "label_bytes": "Bytes (UTF-8)",
+  "text_label": "TEXT",
+  "input_placeholder": "Type or paste text here...",
+  "clear_btn": "Clear",
+  "aria_main": "Word counter",
+  "aria_clear_btn": "Clear text",
+  "announce_cleared": "Text cleared"
+}

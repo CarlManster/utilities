@@ -106,6 +106,8 @@ function analyticalExpectedValue(faces, numDice, isProduct) {
 <script src="DayInfo/DayInfo.js"></script>
 <script src="QRGenerator/QRGenerator_lang.js"></script>
 <script src="QRGenerator/QRGenerator.js"></script>
+<script src="WordCounter/WordCounter_lang.js"></script>
+<script src="WordCounter/WordCounter.js"></script>
 
 <script>
 /* ══════════════════════════════════════
@@ -611,6 +613,89 @@ describe('QRGenerator - computeAddRecent', function() {
     expect(list.length).toBe(1);
     expect(list[0].text).toBe('a');
   });
+});
+
+/* ── WordCounter ── */
+var W = window._WordCounter || {};
+
+describe('WordCounter - countWords', function() {
+  it('empty string → 0', function() { expect(W.countWords('')).toBe(0); });
+  it('whitespace only → 0', function() { expect(W.countWords('  \n\t  ')).toBe(0); });
+  it('English with punctuation', function() { expect(W.countWords('Hello, world!')).toBe(2); });
+  it('Korean words separated by spaces', function() {
+    expect(W.countWords('안녕하세요, 반갑습니다.')).toBe(2);
+  });
+  it('hyphenated word counts once', function() { expect(W.countWords('a well-known fact')).toBe(3); });
+  it('spaced dash is not a word', function() { expect(W.countWords('a - b')).toBe(2); });
+  it('emoji alone is not a word', function() { expect(W.countWords('👍 🎉')).toBe(0); });
+  it('newlines separate words', function() { expect(W.countWords('one\ntwo\r\nthree')).toBe(3); });
+  it('Japanese without spaces is segmented (Intl.Segmenter only)', function() {
+    if (!W.HAS_SEGMENTER) return;
+    expect(W.countWords('これはペンです')).toBeGreaterThan(1);
+  });
+});
+
+describe('WordCounter - countWordsBySpace (fallback)', function() {
+  it('empty → 0', function() { expect(W.countWordsBySpace('')).toBe(0); });
+  it('splits on whitespace', function() { expect(W.countWordsBySpace(' one  two\nthree ')).toBe(3); });
+  it('ignores punctuation-only tokens', function() { expect(W.countWordsBySpace('a - b — !!')).toBe(2); });
+  it('keeps hyphenated tokens whole', function() { expect(W.countWordsBySpace('well-known')).toBe(1); });
+});
+
+describe('WordCounter - countCharacters', function() {
+  it('empty → 0', function() { expect(W.countCharacters('')).toBe(0); });
+  it('ASCII', function() { expect(W.countCharacters('Hello world')).toBe(11); });
+  it('Korean syllables count 1 each', function() { expect(W.countCharacters('안녕하세요 세계')).toBe(8); });
+  it('whitespace and newlines are characters', function() { expect(W.countCharacters('a\nb c')).toBe(5); });
+  it('astral emoji counts 1 (not 2 UTF-16 units)', function() { expect(W.countCharacters('😀')).toBe(1); });
+  it('ZWJ family emoji counts 1 (Intl.Segmenter only)', function() {
+    if (!W.HAS_SEGMENTER) return;
+    expect(W.countCharacters('👨‍👩‍👧')).toBe(1);
+  });
+  it('combining accent counts 1 (Intl.Segmenter only)', function() {
+    if (!W.HAS_SEGMENTER) return;
+    expect(W.countCharacters('é')).toBe(1);
+  });
+});
+
+describe('WordCounter - countCharactersNoSpaces', function() {
+  it('empty → 0', function() { expect(W.countCharactersNoSpaces('')).toBe(0); });
+  it('whitespace only → 0', function() { expect(W.countCharactersNoSpaces(' \t\r\n ')).toBe(0); });
+  it('excludes spaces, tabs and line breaks', function() {
+    expect(W.countCharactersNoSpaces('a b\tc\nd\r\ne')).toBe(5);
+  });
+  it('Korean', function() { expect(W.countCharactersNoSpaces('안녕하세요 세계')).toBe(7); });
+  it('excludes NBSP and full-width (U+3000) space', function() {
+    expect(W.countCharactersNoSpaces('a b　c')).toBe(3);
+  });
+  it('punctuation is kept', function() { expect(W.countCharactersNoSpaces('Hi, there!')).toBe(9); });
+  it('emoji counts as a character', function() { expect(W.countCharactersNoSpaces('😀 😀')).toBe(2); });
+  it('ZWJ family emoji counts 1 (Intl.Segmenter only)', function() {
+    if (!W.HAS_SEGMENTER) return;
+    expect(W.countCharactersNoSpaces(' 👨‍👩‍👧 ')).toBe(1);
+  });
+});
+
+describe('WordCounter - countBytes (UTF-8)', function() {
+  it('empty → 0', function() { expect(W.countBytes('')).toBe(0); });
+  it('ASCII = 1 byte each', function() { expect(W.countBytes('Hello world')).toBe(11); });
+  it('Latin-1 accent = 2 bytes', function() { expect(W.countBytes('é')).toBe(2); });
+  it('Hangul = 3 bytes each', function() { expect(W.countBytes('안녕하세요 세계')).toBe(22); });
+  it('astral emoji = 4 bytes', function() { expect(W.countBytes('😀')).toBe(4); });
+  it('ZWJ family emoji = 18 bytes', function() { expect(W.countBytes('👨‍👩‍👧')).toBe(18); });
+  it('lone surrogate encodes as U+FFFD (3 bytes)', function() { expect(W.countBytes('\uD800')).toBe(3); });
+});
+
+describe('WordCounter - computeStats / toLocaleTag', function() {
+  it('returns all counts', function() {
+    expect(W.computeStats('Hi 안녕')).toEqual({ words: 2, chars: 5, charsNoSpaces: 4, bytes: 9 });
+  });
+  it('empty text → all zero', function() {
+    expect(W.computeStats('')).toEqual({ words: 0, chars: 0, charsNoSpaces: 0, bytes: 0 });
+  });
+  it('jp → ja', function() { expect(W.toLocaleTag('jp')).toBe('ja'); });
+  it('ko → ko', function() { expect(W.toLocaleTag('ko')).toBe('ko'); });
+  it('missing → en', function() { expect(W.toLocaleTag(undefined)).toBe('en'); });
 });
 
 /* ── Settings ── */

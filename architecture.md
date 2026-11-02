@@ -26,7 +26,8 @@ utilities/
 ├── FolderImageSlideShow/       #  │
 ├── JSONVisualizer/             #  │
 ├── QRGenerator/                #  │
-└── Repayment/                  # ─┘
+├── Repayment/                  #  │
+└── WordCounter/                # ─┘
 ```
 
 Each utility folder follows the same convention:
@@ -158,6 +159,13 @@ Each module is a single document. They share the same conventions (i18n attribut
 - **Error states**: distinct messages for `no_images`, `unsupported`, `blocked` (iframe / insecure origin), `denied` (NotAllowedError), `read_error` (NotFoundError / NotReadableError), and `unknown`. AbortError on cancel is silent.
 - **Notable**: Pause/Resume button respects `isPaused` inside `scheduleNext`; Reload preserves the current pause state; live language changes refresh the localized image count and pause-button label using the cached `lastFolderName` / `lastFolderCount`.
 
+### WordCounter
+- **Purpose**: Live word / character / byte counts for text typed or pasted into a full-height textarea; the three counts are shown large at the top, with a "characters excluding whitespace" sub-line under the character count.
+- **Core**: IIFE module. Words and characters use `Intl.Segmenter` — `granularity: 'word'` counting `isWordLike` segments (so Japanese / Chinese written without spaces are still split into words, and punctuation or emoji aren't words), `granularity: 'grapheme'` for user-perceived characters (`👨‍👩‍👧`, `e\u0301` = 1); the same pass counts whitespace-only graphemes (space, tab, line breaks, NBSP, U+3000) to derive the excluding-whitespace count. A lone hyphen between two words joins them (`well-known` = 1). Without `Intl.Segmenter` it falls back to whitespace tokens containing a letter/digit and code-point length. Bytes are UTF-8 via `TextEncoder`. Recounts are coalesced to one per animation frame; numbers use `Intl.NumberFormat` for the UI language.
+- **Persistence**: none.
+- **Live i18n**: subscribes to `I18N.onLangChange` to re-format numbers; labels are static `data-i18n`.
+- **Test exposure**: under `__UNITTEST__`, exposes `countWords`, `countWordsBySpace`, `countWordsBySegmenter`, `countCharacters`, `countCharactersNoSpaces`, `countBytes`, `computeStats`, `toLocaleTag`, `HAS_SEGMENTER` on `window._WordCounter`.
+
 ## Cross-cutting conventions
 
 - **No build step for code.** A user can serve the directory with any static server. Only translation `_lang.js` files are generated, by `build_lang.sh`.
@@ -177,7 +185,7 @@ Mechanics:
 3. Loads source files in dependency order, ending with the per-module `_lang.js` and module JS.
 4. `Run Tests` button awaits `Settings.ready`, then iterates suites synchronously, recording pass/fail/elapsed.
 
-Currently covered: I18N, Settings, DayInfo (date/calendar conversions, Julian Day, lunar table & algorithm), Dice (analytical EV), QRGenerator (mode detection, formatting, list dedup/cap).
+Currently covered: I18N, Settings, DayInfo (date/calendar conversions, Julian Day, lunar table & algorithm), Dice (analytical EV), QRGenerator (mode detection, formatting, list dedup/cap), WordCounter (word / grapheme / whitespace-excluded / UTF-8 byte counting, fallback tokenizer).
 
 ## Adding a new utility
 
